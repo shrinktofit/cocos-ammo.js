@@ -49,6 +49,9 @@ declare namespace Bullet {
         P2PConstraint_new(ptr0: ptr, ptr1: ptr, ptr2: ptr, ptr3: ptr): ptr;
         P2PConstraint_setPivotA(ptr0: ptr, ptr1: ptr): void;
         P2PConstraint_setPivotB(ptr0: ptr, ptr1: ptr): void;
+        TypedConstraint_setMaxImpulseThreshold(ptr0: ptr, maxImpulse: number): void;
+        FixedConstraint_new(ptr0: ptr, ptr1: ptr, ptr2: ptr, ptr3: ptr): ptr;
+        FixedConstraint_setFrames(ptr0: ptr, ptr1: ptr, ptr2: ptr): void;
 
         // shapes
 
@@ -221,5 +224,7 @@ declare namespace Bullet {
 }
 
 declare module '@cocos/bullet' {
-    export = instantiate;
+    const bulletType: 'fallback' | 'wasm' | 'asmjs';
+    export { bulletType }
+    export default instantiate;
 }
