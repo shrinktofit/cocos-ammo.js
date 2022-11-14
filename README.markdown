@@ -1,10 +1,10 @@
 ammo.js
 =======
 
-# Install for Cocos Creator 3D
+# Install for Cocos Creator
 
-Install module via npm for cocos creator 3d:
-usage : `npm install github:cocos-creator/cocos-ammo.js#cocos-master --save`。
+Install module via npm for Cocos Creator:
+usage : `npm install github:cocos/cocos-ammo.js#cocos-master --save`。
 
 # Compile pipeline
 
