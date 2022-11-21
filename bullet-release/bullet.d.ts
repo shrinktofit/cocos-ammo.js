@@ -8,16 +8,15 @@ declare namespace Bullet {
         _free(p: ptr): void;
         _read_f32(p: ptr): void;
         _write_f32(p: ptr, v: number): void;
-
+        _safe_delete(p: ptr, bulletType: number):void;
+        
         Vec3_new(x: number, y: number, z: number): ptr;
-        Vec3_del(p: ptr): void;
         Vec3_x(p: ptr): number;
         Vec3_y(p: ptr): number;
         Vec3_z(p: ptr): number;
         Vec3_set(p: ptr, x: number, y: number, z: number): void;
 
         Quat_new(x: number, y: number, z: number, w: number): ptr;
-        Quat_del(p: ptr): void;
         Quat_x(p: ptr): number;
         Quat_y(p: ptr): number;
         Quat_z(p: ptr): number;
@@ -25,13 +24,11 @@ declare namespace Bullet {
         Quat_set(p: ptr, x: number, y: number, z: number, w: number): void;
 
         Transform_new(): ptr;
-        Transform_del(p: ptr): void;
         Transform_setIdentity(p: ptr): void;
         Transform_getOrigin(p: ptr): ptr;
         Transform_setRotation(p: ptr, quate: ptr): void;
         Transform_getRotation(p: ptr, quate: ptr): void;
 
-        MotionState_del(p: ptr): void;
         MotionState_getWorldTransform(p: ptr, transform: ptr): void;
         MotionState_setWorldTransform(p: ptr, transform: ptr): void;
         ccMotionState_new(id: number, initTrans: ptr): ptr;
@@ -42,7 +39,6 @@ declare namespace Bullet {
 
         // constraints
 
-        TypedConstraint_del(p: ptr): void;
         TypedConstraint_getFixedBody(): ptr;
         HingeConstraint_new(ptr0: ptr, ptr1: ptr, ptr2: ptr, ptr3: ptr): ptr;
         HingeConstraint_setFrames(ptr0: ptr, ptr1: ptr, ptr2: ptr): void;
@@ -55,7 +51,6 @@ declare namespace Bullet {
 
         // shapes
 
-        CollisionShape_del(p: ptr): void;
         // CollisionShape_getUserIndex(p: ptr): number;
         // CollisionShape_setUserIndex(p: ptr, i: number): void;
         CollisionShape_isCompound(p: ptr): boolean;
@@ -95,7 +90,6 @@ declare namespace Bullet {
         TerrainShape_new(i: number, j: number, p: ptr, hs: number, min: number, max: number): ptr;
 
         TriangleMesh_new(): ptr;
-        TriangleMesh_del(p: ptr): void;
         TriangleMesh_addTriangle(p: ptr, v0: ptr, v1: ptr, v2: ptr): void;
         BvhTriangleMeshShape_new(p: ptr, c: boolean, bvh: boolean): ptr;
         ConvexTriangleMeshShape_new(p: ptr): ptr;
@@ -114,7 +108,6 @@ declare namespace Bullet {
         // collision
 
         CollisionObject_new(): number;
-        CollisionObject_del(p: ptr): void;
         CollisionObject_getCollisionShape(p: ptr): ptr;
         CollisionObject_setContactProcessingThreshold(p: ptr, contactProcessingThreshold: number): void;
         CollisionObject_getActivationState(p: ptr): number;
@@ -166,7 +159,6 @@ declare namespace Bullet {
 
         DefaultCollisionConfiguration_static(): ptr;
         CollisionDispatcher_new(): ptr;
-        CollisionDispatcher_del(p: ptr): void;
         Dispatcher_getNumManifolds(p: ptr): number;
         Dispatcher_getManifoldByIndexInternal(p: ptr, i: number): ptr;
 
@@ -186,11 +178,8 @@ declare namespace Bullet {
         ManifoldPoint_get_m_positionWorldOnB(p: ptr): ptr;
 
         DbvtBroadphase_new(): ptr;
-        DbvtBroadphase_del(p: ptr): void;
         SequentialImpulseConstraintSolver_new(): ptr;
-        SequentialImpulseConstraintSolver_del(p: ptr): void;
 
-        CollisionWorld_del(p: ptr): void;
         CollisionWorld_addCollisionObject(p: ptr, body: ptr, g: number, m: number): void;
         CollisionWorld_removeCollisionObject(p: ptr, body: ptr): void;
         CollisionWorld_rayTest(p: ptr, p0: ptr, p1: ptr, p2: ptr): void;
