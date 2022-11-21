@@ -196,12 +196,14 @@ declare namespace Bullet {
         RayCallback_hasHit(p: ptr): boolean;
 
         ccAllRayCallback_static(): ptr;
+        ccAllRayCallback_setFlags(p: ptr, flag: number): void;
         ccAllRayCallback_reset(p: ptr, p0: ptr, p1: ptr, m: number, q: boolean): void;
         ccAllRayCallback_getHitPointWorld(p: ptr): ptr;
         ccAllRayCallback_getHitNormalWorld(p: ptr): ptr;
         ccAllRayCallback_getCollisionShapePtrs(p: ptr): ptr;
 
         ccClosestRayCallback_static(): ptr;
+        ccClosestRayCallback_setFlags(p: ptr, flag: number): void;
         ccClosestRayCallback_reset(p: ptr, p0: ptr, p1: ptr, m: number, q: boolean): void;
         ccClosestRayCallback_getHitPointWorld(p: ptr): ptr;
         ccClosestRayCallback_getHitNormalWorld(p: ptr): ptr;
