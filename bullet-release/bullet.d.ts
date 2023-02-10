@@ -42,6 +42,12 @@ declare namespace Bullet {
         TypedConstraint_getFixedBody(): ptr;
         HingeConstraint_new(ptr0: ptr, ptr1: ptr, ptr2: ptr, ptr3: ptr): ptr;
         HingeConstraint_setFrames(ptr0: ptr, ptr1: ptr, ptr2: ptr): void;
+        HingeConstraint_setLimit(ptr: ptr, low: number, upper: number, softness: number, biasFactor: number, relaxationFactor: number): void;
+        HingeConstraint_setAngularOnly(ptr: ptr, angular: number): void;
+        HingeConstraint_enableMotor(ptr: ptr, enable: boolean): void;
+        HingeConstraint_setMotorVelocity(ptr: ptr, velocity: number): void;
+        HingeConstraint_setMaxMotorImpulse(ptr: ptr, maxImpulse: number): void;
+        HingeConstraint_setMotorTarget(ptr: ptr, target: number, dt: number): void;
         P2PConstraint_new(ptr0: ptr, ptr1: ptr, ptr2: ptr, ptr3: ptr): ptr;
         P2PConstraint_setPivotA(ptr0: ptr, ptr1: ptr): void;
         P2PConstraint_setPivotB(ptr0: ptr, ptr1: ptr): void;
