@@ -8,8 +8,8 @@ declare namespace Bullet {
         _free(p: ptr): void;
         _read_f32(p: ptr): void;
         _write_f32(p: ptr, v: number): void;
-        _safe_delete(p: ptr, bulletType: number):void;
-        
+        _safe_delete(p: ptr, bulletType: number): void;
+
         Vec3_new(x: number, y: number, z: number): ptr;
         Vec3_x(p: ptr): number;
         Vec3_y(p: ptr): number;
@@ -48,6 +48,19 @@ declare namespace Bullet {
         TypedConstraint_setMaxImpulseThreshold(ptr0: ptr, maxImpulse: number): void;
         FixedConstraint_new(ptr0: ptr, ptr1: ptr, ptr2: ptr, ptr3: ptr): ptr;
         FixedConstraint_setFrames(ptr0: ptr, ptr1: ptr, ptr2: ptr): void;
+        Generic6DofSpring2Constraint_new(ptr0: ptr, ptr1: ptr, ptr2: ptr, ptr3: ptr, rotateOrder: number): ptr;
+        Generic6DofSpring2Constraint_setFrames(ptr0: ptr, ptr1: ptr, ptr2: ptr): void;
+        Generic6DofSpring2Constraint_setLimit(ptr0: ptr, index: number, lo: number, hi: number): void;
+        Generic6DofSpring2Constraint_enableSpring(ptr0: ptr, index: number, onOff: boolean): void;
+        Generic6DofSpring2Constraint_setStiffness(ptr0: ptr, index: number, stiffness: number): void;
+        Generic6DofSpring2Constraint_setDamping(ptr0: ptr, index: number, damping: number): void;
+        Generic6DofSpring2Constraint_setBounce(ptr0: ptr, index: number, bounce: number): void;
+        Generic6DofSpring2Constraint_setEquilibriumPoint(ptr0: ptr, index: number, val: number): void;
+        Generic6DofSpring2Constraint_enableMotor(ptr0: ptr, index: number, onOff: boolean): void;
+        Generic6DofSpring2Constraint_setMaxMotorForce(ptr0: ptr, index: number, force: number): void;
+        Generic6DofSpring2Constraint_setTargetVelocity(ptr0: ptr, index: number, velocity: number): void;
+        Generic6DofSpring2Constraint_setServo(ptr0: ptr, index: number, onOff: boolean): number;
+        Generic6DofSpring2Constraint_setServoTarget(ptr0: ptr, index: number, target: number): number;
 
         // shapes
 
