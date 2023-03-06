@@ -111,6 +111,9 @@ declare namespace Bullet {
         TriangleMesh_new(): ptr;
         TriangleMesh_addTriangle(p: ptr, v0: ptr, v1: ptr, v2: ptr): void;
         BvhTriangleMeshShape_new(p: ptr, c: boolean, bvh: boolean): ptr;
+        BvhTriangleMeshShape_getOptimizedBvh(p: ptr): ptr;
+        BvhTriangleMeshShape_setOptimizedBvh(p: ptr, p1: ptr, scaleX: number, scaleY: number, scaleZ: number);
+        ScaledBvhTriangleMeshShape_new(p: ptr, scaleX: number, scaleY: number, scaleZ: number): ptr;
         ConvexTriangleMeshShape_new(p: ptr): ptr;
 
         SimplexShape_new(): ptr;
