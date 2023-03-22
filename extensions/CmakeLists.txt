@@ -9,6 +9,7 @@ SET(Extensions_SRCS
 ccDiscreteDynamicsWorld.cpp
 ccKinematicCharacterController.cpp
 ccCompoundShape.cpp
+btCharacterController.cpp
 )
 
 SET(Extensions_HDRS
@@ -19,6 +20,8 @@ ccKinematicCharacterController.h
 ccOverlapFilterCallback.h
 ccRayResultCallback.h
 ccConvexCastCallBack.h
+btCharacterController.h
+btCharacterControllerDefs.h
 )
 
 ADD_LIBRARY(Extensions ${Extensions_SRCS} ${Extensions_HDRS})

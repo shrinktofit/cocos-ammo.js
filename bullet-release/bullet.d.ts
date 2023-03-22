@@ -92,6 +92,9 @@ declare namespace Bullet {
         TriangleMesh_new(): ptr;
         TriangleMesh_addTriangle(p: ptr, v0: ptr, v1: ptr, v2: ptr): void;
         BvhTriangleMeshShape_new(p: ptr, c: boolean, bvh: boolean): ptr;
+        BvhTriangleMeshShape_getOptimizedBvh(p: ptr): ptr;
+        BvhTriangleMeshShape_setOptimizedBvh(p: ptr, p1: ptr, scaleX: number, scaleY: number, scaleZ: number);
+        ScaledBvhTriangleMeshShape_new(p: ptr, scaleX: number, scaleY: number, scaleZ: number): ptr;
         ConvexTriangleMeshShape_new(p: ptr): ptr;
 
         SimplexShape_new(): ptr;
@@ -211,6 +214,23 @@ declare namespace Bullet {
 
         ccMaterial_new(): ptr;
         ccMaterial_set(p: ptr, r: number, f: number, rf: number, sf: number): void;
+
+        // CharacterController
+        ControllerHitReport_new(): ptr;
+        CharacterController_getGhostObject(ptrCCT: ptr): ptr;
+        CharacterController_move(ptrCCT: ptr, ptrMovement: ptr, minDist: number, deltaTime: number):number;
+        CharacterController_getPosition(ptrCCT: ptr);
+        CapsuleCharacterControllerDesc_new(maxSlopeRadians: number, stepHeight: number, contactOffset: number, 
+            ptrUpAxis: ptr, ptrInitPos: ptr, ptruUserControllerHitReport: ptr, radius: number, height: number): ptr;
+        CapsuleCharacterController_new(collisionWorld: ptr, ptrBtCapsuleCharacterControllerDesc: ptr, userObjectPointer: ptr): ptr;
+        CapsuleCharacterController_setRadius(ptrCCT: ptr, radius: number): void;
+        CapsuleCharacterController_setHeight(ptrCCT: ptr, height: number): void;
+        BoxCharacterControllerDesc_new(maxSlopeRadians: number, stepHeight: number, contactOffset: number, 
+            ptrUpAxis: ptr, ptrInitPos: ptr, ptruUserControllerHitReport: ptr, halfHeight: number, halfSideExtent: number, halfForwardExtent: number): ptr;
+        BoxCharacterController_new(collisionWorld: ptr, ptrBtBoxCharacterControllerDesc: ptr, userObjectPointer: ptr): ptr;
+        BoxCharacterController_setHalfHeight(ptrCCT: ptr, v: number): void;
+        BoxCharacterController_setHalfSideExtent(ptrCCT: ptr, v: number): void;
+        BoxCharacterController_setHalfForwardExtent(ptrCCT: ptr, v: number): void;
     }
 }
 
