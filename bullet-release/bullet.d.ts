@@ -218,6 +218,12 @@ declare namespace Bullet {
         // CharacterController
         ControllerHitReport_new(): ptr;
         CharacterController_getGhostObject(ptrCCT: ptr): ptr;
+        ControllerHit_getHitWorldPos(ptr: ptr): ptr;
+        ControllerHit_getHitWorldNormal(ptr: ptr): ptr;
+        ControllerHit_getHitMotionDir(ptr: ptr): ptr;         //CCT hit Motion direction
+        ControllerHit_getHitMotionLength(ptr: ptr): number;   //CCT hit Motion length
+        ControllerShapeHit_getHitShape(ptr: ptr): ptr;
+        ControllerShapeHit_getHitCollisionObject(ptr: ptr): ptr;
         CharacterController_move(ptrCCT: ptr, ptrMovement: ptr, minDist: number, deltaTime: number):number;
         CharacterController_getPosition(ptrCCT: ptr);
         CapsuleCharacterControllerDesc_new(maxSlopeRadians: number, stepHeight: number, contactOffset: number, 

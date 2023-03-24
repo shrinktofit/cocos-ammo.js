@@ -34,7 +34,8 @@ struct btSweptContact {
 	btVector3			mWorldPos;		// Contact position in world space
 	btVector3			mWorldNormal;	// Contact normal in world space
 	btScalar			mDistance;		// Contact distance: mtd. ==0 if penetration
-	btCollisionObject*	mColliderObject; // Touched geometry
+	btCollisionObject*	mColliderObject; 
+	btCollisionShape*	mColliderShape; // Touched geometry
 };
 
 /**
@@ -53,7 +54,8 @@ struct btControllerHit {
 @see btUserControllerHitReport.onShapeHit()
 */
 struct btControllerShapeHit : public btControllerHit {
-	btCollisionObject*	mColliderObject;
+	btCollisionShape*	mCollisionShape;
+	btCollisionObject*	mCollisionObject;
 };
 
 /**

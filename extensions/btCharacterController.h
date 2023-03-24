@@ -83,6 +83,8 @@ protected:
 	//keep track of the contact manifolds
 	btManifoldArray m_manifoldArray;//todo
 
+	btControllerCollisionFlag m_prevCollisionFlag;
+
 	// internal functions called by move()
 	btControllerCollisionFlag moveCharacter(const btVector3& disp, btScalar minDist, btScalar elapsedTime);
 	bool doSweepTest(const btVector3& disp, btScalar minDist, SweepPass sweepPass, int maxIter);

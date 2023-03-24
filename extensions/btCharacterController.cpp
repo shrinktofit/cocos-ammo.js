@@ -10,6 +10,7 @@
 #include "BulletCollision/CollisionShapes/btCapsuleShape.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 #include "LinearMath/btDefaultMotionState.h"
+#include "BulletCollision/CollisionShapes/btCompoundShape.h"
 
 #define MAX_ITER 10
 #define BULLET_CharacterController_DEBUG_LOG 0
@@ -86,6 +87,15 @@ public:
 		if (!convexResult.m_hitCollisionObject->hasContactResponse())
 			return btScalar(1.0);
 
+		const btCollisionShape* shape = convexResult.m_hitCollisionObject->getCollisionShape();
+		if (shape->isCompound()) {
+			const int index = convexResult.m_localShapeInfo->m_triangleIndex;
+			m_hitCollisionShape = ((btCompoundShape*)(shape))->getChildShape(index);
+		}
+		else {
+			m_hitCollisionShape = shape;
+		}
+
 		btVector3 hitNormalWorld;
 		if (normalInWorldSpace)
 		{
@@ -99,12 +109,17 @@ public:
 
 		return ClosestConvexResultCallback::addSingleResult(convexResult, normalInWorldSpace);
 	}
+	const btCollisionShape* m_hitCollisionShape{nullptr};
 
 protected:
 	btCollisionObject* m_me;
 };
 
 btControllerCollisionFlag btCharacterController::move(const btVector3& disp, btScalar minDist, btScalar elapsedTime) {
+	//if (disp.fuzzyZero()) { //can not do this, since even through disp is zero, cct still need to collide with env
+	//	return m_prevCollisionFlag;
+	//}
+
 	if (BULLET_CharacterController_DEBUG_LOG) {
 		printf("-------------------\n");
 		printf("-------- move -----\n");
@@ -131,7 +146,7 @@ btControllerCollisionFlag btCharacterController::move(const btVector3& disp, btS
 		printf("----- move END ----\n");
 		printf("-------------------\n");
 	}
-
+	m_prevCollisionFlag = collisionFlag;
 	return collisionFlag;
 }
 
@@ -300,14 +315,20 @@ bool btCharacterController::doSweepTest(const btVector3& disp, btScalar minDist,
 			if (sweepContact.mColliderObject->getInternalType() & btCollisionObject::CO_RIGID_BODY) {
 				btControllerShapeHit hit;
 				hit.controller = this;
-				hit.mColliderObject = sweepContact.mColliderObject;
+				hit.mCollisionShape = sweepContact.mColliderShape;
+				hit.mCollisionObject = sweepContact.mColliderObject;
 				hit.worldNormal = sweepContact.mWorldNormal;
 				hit.worldPos = sweepContact.mWorldPos;
-				//hit.dir
-				//hit.length
-				m_userControllerHitReport->onShapeHit(hit);
+				hit.dir = currentDirection;
+				hit.length = Length;
+				if(sweepContact.mColliderShape)//todo: sometimes it's null
+					m_userControllerHitReport->onShapeHit(hit);
+				else {
+					if (BULLET_CharacterController_DEBUG_LOG)
+						printf("doSweepTest sweepContact.mColliderShape is null\n");
+				}	
 			}
-			else if (sweepContact.mColliderObject->getInternalType() & btCollisionObject::CO_GHOST_OBJECT) {
+			else if (sweepContact.mColliderObject->getInternalType() & btCollisionObject::CO_GHOST_OBJECT) {//seting CCT as CF_NO_CONTACT_RESPONSE makes this impossible
 				void* userptr = sweepContact.mColliderObject->getUserPointer();
 				if (userptr) {
 					btCharacterController* otherCharacter = (btCharacterController*)(userptr);
@@ -316,8 +337,8 @@ bool btCharacterController::doSweepTest(const btVector3& disp, btScalar minDist,
 					hit.other = otherCharacter;
 					hit.worldNormal = sweepContact.mWorldNormal;
 					hit.worldPos = sweepContact.mWorldPos;
-					//hit.dir
-					//hit.length
+					hit.dir = currentDirection;
+					hit.length = Length;
 					m_userControllerHitReport->onControllerHit(hit);
 				}
 			}
@@ -416,13 +437,15 @@ bool btCharacterController::collideGeoms(const btVector3& currentPosition, const
 		sweepContact.mWorldPos = btResult.m_hitPointWorld;
 		sweepContact.mWorldNormal = btResult.m_hitNormalWorld;
 		if (sweepContact.mWorldNormal.fuzzyZero()) {
+			if (BULLET_CharacterController_DEBUG_LOG)
 			printf("sweepContact.mWorldNormal zero %f %f %f\n", sweepContact.mWorldNormal.x(), sweepContact.mWorldNormal.y(), sweepContact.mWorldNormal.z());
 		}
 		sweepContact.mDistance = mtd;
 		if (BULLET_CharacterController_DEBUG_LOG)
 		printf("mtd %f\n", mtd);
 		sweepContact.mColliderObject = (btCollisionObject*)btResult.m_hitCollisionObject;
-		
+		sweepContact.mColliderShape = (btCollisionShape*)btResult.m_hitCollisionShape;
+
 	}	
 	return hasCollide;
 }
@@ -471,7 +494,7 @@ bool btCharacterController::recoverFromPenetration()
 			for (int p = 0; p < manifold->getNumContacts(); p++) {
 				const btManifoldPoint& pt = manifold->getContactPoint(p);
 				btScalar dist = pt.getDistance();
-				currentPosition += pt.m_normalWorldOnB * directionSign * dist * btScalar(0.2);
+				currentPosition += pt.m_normalWorldOnB * directionSign * dist;// *btScalar(0.2);
 				penetration = true;
 			}
 		}
@@ -547,6 +570,7 @@ btCharacterController::btCharacterController(btCollisionWorld* collisionWorld, b
 	setContactOffset(desc->m_contactOffset);
 	setMaxSlope(desc->m_maxSlopeRadians);
 	m_userControllerHitReport = desc->m_userControllerHitReport;
+	m_prevCollisionFlag = btControllerCollisionFlag(0);
 }
 
 btCharacterController::~btCharacterController() {
@@ -571,7 +595,7 @@ btCapsuleCharacterController::btCapsuleCharacterController(btCollisionWorld* col
 	m_convexShape = new btCapsuleShape(desc->m_fRadius, desc->m_fHeight);
 	m_ghostObject = new btPairCachingGhostObject();
 	m_ghostObject->setCollisionShape(m_convexShape);
-	m_ghostObject->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
+	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	m_ghostObject->getWorldTransform().setOrigin(desc->m_initPos);
 	m_ghostObject->setUserPointer(this);
 }
@@ -600,7 +624,7 @@ btBoxCharacterController::btBoxCharacterController(btCollisionWorld* collisionWo
 	m_convexShape = new btBoxShape(halfExtent);
 	m_ghostObject = new btPairCachingGhostObject();
 	m_ghostObject->setCollisionShape(m_convexShape);
-	m_ghostObject->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
+	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	m_ghostObject->getWorldTransform().setOrigin(desc->m_initPos);
 	m_ghostObject->setUserPointer(this);
 }
