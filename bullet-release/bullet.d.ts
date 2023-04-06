@@ -195,6 +195,8 @@ declare namespace Bullet {
         DynamicsWorld_removeRigidBody(p: ptr, body: ptr): void;
         DynamicsWorld_addConstraint(p: ptr, p2: ptr, v: boolean): void;
         DynamicsWorld_removeConstraint(p: ptr, p2: ptr): void;
+        DynamicsWorld_addAction(p: ptr, action: ptr): void;
+        DynamicsWorld_removeAction(p: ptr, action: ptr): void;
 
         RayCallback_hasHit(p: ptr): boolean;
 
@@ -218,6 +220,7 @@ declare namespace Bullet {
         // CharacterController
         ControllerHitReport_new(): ptr;
         CharacterController_getGhostObject(ptrCCT: ptr): ptr;
+        ControllerHit_getCurrentController(ptr: ptr): ptr;
         ControllerHit_getHitWorldPos(ptr: ptr): ptr;
         ControllerHit_getHitWorldNormal(ptr: ptr): ptr;
         ControllerHit_getHitMotionDir(ptr: ptr): ptr;         //CCT hit Motion direction
@@ -226,6 +229,7 @@ declare namespace Bullet {
         ControllerShapeHit_getHitCollisionObject(ptr: ptr): ptr;
         CharacterController_move(ptrCCT: ptr, ptrMovement: ptr, minDist: number, deltaTime: number):number;
         CharacterController_getPosition(ptrCCT: ptr);
+        CharacterController_setCollision(ptrCCT: ptr, collision: boolean);
         CapsuleCharacterControllerDesc_new(maxSlopeRadians: number, stepHeight: number, contactOffset: number, 
             ptrUpAxis: ptr, ptrInitPos: ptr, ptruUserControllerHitReport: ptr, radius: number, height: number): ptr;
         CapsuleCharacterController_new(collisionWorld: ptr, ptrBtCapsuleCharacterControllerDesc: ptr, userObjectPointer: ptr): ptr;

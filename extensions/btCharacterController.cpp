@@ -142,6 +142,13 @@ btControllerCollisionFlag btCharacterController::move(const btVector3& disp, btS
 	}
 
 	if (BULLET_CharacterController_DEBUG_LOG) {
+		btVector3 finalPos = m_ghostObject->getWorldTransform().getOrigin();
+		btVector3 finalDisp = finalPos - backupPos;
+		if (finalDisp.length() > 0.1) {
+			printf("");
+		}
+		printf("move initi disp\t \n%f %f %f\n", disp.x(), disp.y(), disp.z());
+		printf("move final disp\t \n%f %f %f\n", finalDisp.x(), finalDisp.y(), finalDisp.z());
 		printf("-------------------\n");
 		printf("----- move END ----\n");
 		printf("-------------------\n");
@@ -180,6 +187,11 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 
 	btVector3 SideVector = tangent_compo;
 	const bool sideVectorIsZero = !standingOnMovingUp && SideVector.fuzzyZero();
+
+	if (BULLET_CharacterController_DEBUG_LOG) {
+		printf("------moveCharacter------\n");
+		printf("moveCharacter disp\t \n%f %f %f\n", disp.x(), disp.y(), disp.z());
+	}
 
 	//UP
 	//doSweepTest
@@ -220,9 +232,14 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 			printf("doSweepTest DOWN testSlope\n");
 			if(testSlope(mContactWorldNormal, m_up, btCos(m_maxSlopeRadians))) {
 				//if(mContactPointHeight > originalBottomPoint + m_stepHeight) {
-					if (BULLET_CharacterController_DEBUG_LOG)
-					printf("doSweepTest DOWN testSlope hit NonWalkable\n");
+					if (BULLET_CharacterController_DEBUG_LOG) {
+						printf("doSweepTest DOWN testSlope hit NonWalkable\n");
+						printf("mContactWorldNormal %f %f %f\n", mContactWorldNormal.x(),
+							mContactWorldNormal.y(), mContactWorldNormal.z());
+					}
 					m_bHitNonWalkable = true;
+
+
 					if(!walkExperiment){//not walk experiment
 						return collisionFlag;
 					} else {//walk experiment
@@ -249,10 +266,14 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 
 	}
 
+	if (BULLET_CharacterController_DEBUG_LOG) {
+		printf("------moveCharacter END------\n");
+	}
 	return collisionFlag;
 }
 
 bool btCharacterController::doSweepTest(const btVector3& disp, btScalar minDist, SweepPass sweepPass, int maxIter) {
+
 	if(disp.fuzzyZero()){
 		return false;
 	}
@@ -264,10 +285,10 @@ bool btCharacterController::doSweepTest(const btVector3& disp, btScalar minDist,
 	btVector3 targetPosition = currentPosition;
 	targetPosition += disp;
 	if (BULLET_CharacterController_DEBUG_LOG) {
-		printf("------doSweepTest------ %d", (int)sweepPass);
-		printf("doSweepTest SweepPass\t %d\n", (int)sweepPass);
+		printf("------doSweepTest------\n");
+		printf("doSweepTest SweepPass\t %s\n", gStrSweepPass[(int)sweepPass].c_str());
 		printf("doSweepTest currentPosition\t \n%f %f %f\n", currentPosition.x(), currentPosition.y(), currentPosition.z());
-		printf("doSweepTest disp\t %f %f %f\n", disp.x(), disp.y(), disp.z());
+		printf("doSweepTest disp\t \n%f %f %f\n", disp.x(), disp.y(), disp.z());
 	}
 	while(maxIter--) {
 		if(BULLET_CharacterController_DEBUG_LOG)
@@ -381,6 +402,7 @@ bool btCharacterController::doSweepTest(const btVector3& disp, btScalar minDist,
 		mContactPointHeight = sweepContact.mWorldPos.dot(m_up);	// UBI
 		mContactWorldPos = sweepContact.mWorldPos;
 		mContactWorldNormal = sweepContact.mWorldNormal;
+
 		if (walkExperiment) {//walk experiment needs to cancel out vertical hit normal
 			btVector3 normalCompo, tangentCompo;
 			decomposeVector(normalCompo, tangentCompo, mContactWorldNormal, m_up);
@@ -479,8 +501,8 @@ bool btCharacterController::recoverFromPenetration()
 		btBroadphasePair* collisionPair = &m_ghostObject->getOverlappingPairCache()->getOverlappingPairArray()[i];
 		btCollisionObject* obj0 = static_cast<btCollisionObject*>(collisionPair->m_pProxy0->m_clientObject);
 		btCollisionObject* obj1 = static_cast<btCollisionObject*>(collisionPair->m_pProxy1->m_clientObject);
-		if ((obj0 && !obj0->hasContactResponse()) || (obj1 && !obj1->hasContactResponse()))
-			continue;
+		//if ((obj0 && !obj0->hasContactResponse()) || (obj1 && !obj1->hasContactResponse()))
+		//	continue;
 
 		if (!needsCollision(obj0, obj1))
 			continue;
@@ -575,6 +597,15 @@ btCharacterController::btCharacterController(btCollisionWorld* collisionWorld, b
 
 btCharacterController::~btCharacterController() {
 }
+
+void btCharacterController::updateAction(btCollisionWorld* collisionWorld, btScalar deltaTimeStep) {
+	if (m_bDetectCollisions) {
+		for (int t = 0; t < 4; t++) {
+			recoverFromPenetration();
+		}
+	}
+}
+
 void btCharacterController::setMaxSlope(btScalar slopeRadians) {
 	m_maxSlopeRadians = slopeRadians;
 }

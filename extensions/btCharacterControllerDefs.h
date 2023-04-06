@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LinearMath/btVector3.h"
+#include <string>
 
 class btCollisionShape;
 class btConvexShape;
@@ -15,6 +16,7 @@ enum SweepPass {
 	SWEEP_PASS_DOWN,
 	SWEEP_PASS_SENSOR
 };
+static const std::string gStrSweepPass[] = { "UP", "SIDE", "DOWN", "SENSOR"};
 
 //enum SweepTestFlag {
 //	STF_SWEEP_UP				= (1<<0),

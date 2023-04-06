@@ -2,6 +2,7 @@
 
 #include "LinearMath/btVector3.h"
 #include "BulletCollision/BroadphaseCollision/btCollisionAlgorithm.h"
+#include "BulletDynamics/Dynamics/btActionInterface.h"
 
 #include "btCharacterControllerDefs.h"
 
@@ -11,7 +12,7 @@ class btCollisionWorld;
 class btCollisionDispatcher;
 class btPairCachingGhostObject;
 
-class btCharacterController {
+class btCharacterController : public btActionInterface {
 public:
 	//btCharacterController(btCollisionWorld* collisionWorld, btPairCachingGhostObject * ghostObject,
 	//	btConvexShape * convexShape, btScalar stepHeight, btScalar contactOffset, btScalar masSlopeRadians,
@@ -19,6 +20,10 @@ public:
 	//	void* userObjectPointer = nullptr);
 	btCharacterController(btCollisionWorld* collisionWorld, btCharacterControllerDesc* desc, void* userObjectPointer);
 	~btCharacterController();
+
+	//btActionInterface
+	virtual void updateAction(btCollisionWorld* collisionWorld, btScalar deltaTimeStep) override;
+	virtual void debugDraw(btIDebugDraw* debugDrawer) override {};
 
 	virtual		btControllerShapeType::Enum	getType() { return mType; };
 
@@ -45,16 +50,15 @@ public:
 
 	btPairCachingGhostObject* getGhostObject() { return m_ghostObject; };
 	void* getUserPointer() { return m_userObjectPointer; };
-	void setUserPointer(void* userPointer)
-	{
-		m_userObjectPointer = userPointer;
-	}
+	void setUserPointer(void* userPointer) { m_userObjectPointer = userPointer;}
 
 	// radius + height * 0.5  //height is distance between two sphere center
 	virtual btScalar getFullHalfHeight() = 0;
 
 	void setPosition(const btVector3& pos);
 	const btVector3& getPosition();
+
+	void setCollision(bool v) { m_bDetectCollisions = v; };
 
 protected:
 	btPairCachingGhostObject* m_ghostObject;
@@ -74,6 +78,7 @@ protected:
 	// status
 	bool m_bHitNonWalkable;
 	bool walkExperiment = false;
+	bool m_bDetectCollisions = true;
 
 	// contact info
 	btScalar mContactPointHeight;
