@@ -85,6 +85,10 @@ protected:
 	btVector3 mContactWorldNormal;
 	btVector3 mContactWorldPos;
 
+	//
+	btConvexShape* m_convexShapeBOX = nullptr; //only used for autoStep SWEEP_PASS_SIDE
+	bool m_bCollideGeomsUsingShapeBOX{false};
+
 	//keep track of the contact manifolds
 	btManifoldArray m_manifoldArray;//todo
 

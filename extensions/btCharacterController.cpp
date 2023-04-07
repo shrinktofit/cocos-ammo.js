@@ -199,6 +199,10 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 		if(!sideVectorIsZero)
 			UpVector += upDirection* m_stepHeight;
 
+		if (!UpVector.fuzzyZero()) {
+			if(BULLET_CharacterController_DEBUG_LOG) printf("");
+		}
+
 		if(doSweepTest(UpVector, minDist, SweepPass::SWEEP_PASS_UP, maxIterUp)) {
 			collisionFlag = btControllerCollisionFlag(collisionFlag | btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_UP);
 			if (BULLET_CharacterController_DEBUG_LOG)
@@ -209,11 +213,15 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 	//SIDE
 	//doSweepTest
 	if(1){//(mask & SweepTestFlag::STF_SWEEP_SIDE) {
+		if (!walkExperiment && getType() == btControllerShapeType::eCAPSULE) {
+			m_bCollideGeomsUsingShapeBOX = true;
+		}
 		if(doSweepTest(SideVector, minDist, SweepPass::SWEEP_PASS_SIDE, maxIterSides)) {
 			collisionFlag = btControllerCollisionFlag(collisionFlag | btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_SIDES);
 			if (BULLET_CharacterController_DEBUG_LOG)
 			printf("doSweepTest SIDE collide\n");
 		}
+		m_bCollideGeomsUsingShapeBOX = false;
 	}
 
 	//DOWN
@@ -222,6 +230,9 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 		if(!sideVectorIsZero)		// We disabled that before so we don't have to undo it in that case
 			DownVector -= upDirection * m_stepHeight;	// Undo our artificial up motion
 
+		if (!walkExperiment && getType() == btControllerShapeType::eCAPSULE) {
+			m_bCollideGeomsUsingShapeBOX = true;
+		}
 		if(doSweepTest(DownVector, minDist, SweepPass::SWEEP_PASS_DOWN, maxIterDown)) {
 			collisionFlag = btControllerCollisionFlag(collisionFlag | btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_DOWN);
 			if (BULLET_CharacterController_DEBUG_LOG)
@@ -263,7 +274,7 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 				//}
 			}
 		}
-
+		m_bCollideGeomsUsingShapeBOX = false;
 	}
 
 	if (BULLET_CharacterController_DEBUG_LOG) {
@@ -441,6 +452,9 @@ bool btCharacterController::collideGeoms(const btVector3& currentPosition, const
 	
 	//btConvexShape *convex_shape_test(static_cast<btConvexShape *>(m_ghostObject->getCollisionShape()));
 	btConvexShape *convex_shape_test(m_convexShape);
+	if (m_bCollideGeomsUsingShapeBOX) {
+		convex_shape_test = m_convexShapeBOX;
+	}
 	btTransform shape_world_from = btTransform(btQuaternion::getIdentity(), currentPosition);
 	//btTransform shape_world_to = btTransform(btQuaternion(), targetPosition);//currentPosition + currentDirection * sweepContact.mDistance);
 	btTransform shape_world_to = btTransform(btQuaternion::getIdentity(), currentPosition + (targetPosition - currentPosition).normalize() * sweepContact.mDistance);
@@ -629,6 +643,9 @@ btCapsuleCharacterController::btCapsuleCharacterController(btCollisionWorld* col
 	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	m_ghostObject->getWorldTransform().setOrigin(desc->m_initPos);
 	m_ghostObject->setUserPointer(this);
+
+	btVector3 halfExtent(desc->m_fRadius, desc->m_fHeight * 0.5f + desc->m_fRadius, desc->m_fRadius);
+	m_convexShapeBOX = new btBoxShape(halfExtent);
 }
 
 btScalar btCapsuleCharacterController::getFullHalfHeight() {
