@@ -132,6 +132,7 @@ btControllerCollisionFlag btCharacterController::move(const btVector3& disp, btS
 	m_halfHeight = getFullHalfHeight();	// UBI
 
 	//moveCharacter
+	//m_bCollideGeomsUsingShapeBOX = true;
 	btVector3 backupPos = m_ghostObject->getWorldTransform().getOrigin();
 	btControllerCollisionFlag collisionFlag = moveCharacter(disp, minDist, elapsedTime);// , SweepTestFlag::STF_SWEEP_UP_SIDE_DOWN);
 	if(m_bHitNonWalkable){
@@ -139,6 +140,16 @@ btControllerCollisionFlag btCharacterController::move(const btVector3& disp, btS
 		m_ghostObject->getWorldTransform().setOrigin(backupPos);
 		collisionFlag = moveCharacter(disp, minDist, elapsedTime);// , SweepTestFlag::STF_SWEEP_SIDE_DOWN);
 		walkExperiment = false;
+	}
+
+	//extra down movement for capsule cct
+	if(getType() == btControllerShapeType::eCAPSULE && (collisionFlag && btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_DOWN))
+	{
+		//m_bCollideGeomsUsingShapeBOX = false;
+		m_bOnlyDownTest = true;
+		moveCharacter(disp, minDist, elapsedTime);// , SweepTestFlag::STF_SWEEP_SIDE_DOWN);
+		m_bOnlyDownTest = false;
+		//m_bCollideGeomsUsingShapeBOX = true;
 	}
 
 	if (BULLET_CharacterController_DEBUG_LOG) {
@@ -195,14 +206,14 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 
 	//UP
 	//doSweepTest
-	if(!walkExperiment){//(mask & SweepTestFlag::STF_SWEEP_UP) {
+	if(!walkExperiment && !m_bOnlyDownTest){//(mask & SweepTestFlag::STF_SWEEP_UP) {
 		if(!sideVectorIsZero)
 			UpVector += upDirection* m_stepHeight;
 
 		if (!UpVector.fuzzyZero()) {
 			if(BULLET_CharacterController_DEBUG_LOG) printf("");
 		}
-
+		m_bCollideGeomsUsingShapeBOX = false;
 		if(doSweepTest(UpVector, minDist, SweepPass::SWEEP_PASS_UP, maxIterUp)) {
 			collisionFlag = btControllerCollisionFlag(collisionFlag | btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_UP);
 			if (BULLET_CharacterController_DEBUG_LOG)
@@ -212,7 +223,7 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 
 	//SIDE
 	//doSweepTest
-	if(1){//(mask & SweepTestFlag::STF_SWEEP_SIDE) {
+	if(1 && !m_bOnlyDownTest){//(mask & SweepTestFlag::STF_SWEEP_SIDE) {
 		if (!walkExperiment && getType() == btControllerShapeType::eCAPSULE) {
 			m_bCollideGeomsUsingShapeBOX = true;
 		}
@@ -221,7 +232,9 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 			if (BULLET_CharacterController_DEBUG_LOG)
 			printf("doSweepTest SIDE collide\n");
 		}
-		m_bCollideGeomsUsingShapeBOX = false;
+		if (!walkExperiment && getType() == btControllerShapeType::eCAPSULE) {
+			m_bCollideGeomsUsingShapeBOX = false;
+		}
 	}
 
 	//DOWN
@@ -233,6 +246,10 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 		if (!walkExperiment && getType() == btControllerShapeType::eCAPSULE) {
 			m_bCollideGeomsUsingShapeBOX = true;
 		}
+		if (m_bOnlyDownTest) {
+			m_bCollideGeomsUsingShapeBOX = false;
+		}
+
 		if(doSweepTest(DownVector, minDist, SweepPass::SWEEP_PASS_DOWN, maxIterDown)) {
 			collisionFlag = btControllerCollisionFlag(collisionFlag | btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_DOWN);
 			if (BULLET_CharacterController_DEBUG_LOG)
@@ -241,8 +258,10 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 			//slope
 			if (BULLET_CharacterController_DEBUG_LOG)
 			printf("doSweepTest DOWN testSlope\n");
-			if(testSlope(mContactWorldNormal, m_up, btCos(m_maxSlopeRadians))) {
-				//if(mContactPointHeight > originalBottomPoint + m_stepHeight) {
+			if (!m_bOnlyDownTest)
+			{
+				if (testSlope(mContactWorldNormal, m_up, btCos(m_maxSlopeRadians))) {
+					//if(mContactPointHeight > originalBottomPoint + m_stepHeight) {
 					if (BULLET_CharacterController_DEBUG_LOG) {
 						printf("doSweepTest DOWN testSlope hit NonWalkable\n");
 						printf("mContactWorldNormal %f %f %f\n", mContactWorldNormal.x(),
@@ -251,9 +270,13 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 					m_bHitNonWalkable = true;
 
 
-					if(!walkExperiment){//not walk experiment
+					if (!walkExperiment) {//not walk experiment
+						if (!m_bOnlyDownTest && !walkExperiment && getType() == btControllerShapeType::eCAPSULE) {
+							m_bCollideGeomsUsingShapeBOX = false;
+						}
 						return collisionFlag;
-					} else {//walk experiment
+					}
+					else {//walk experiment
 						btVector3 currentPosition = m_ghostObject->getWorldTransform().getOrigin();
 						const float tmp = currentPosition.dot(upDirection);
 						float Delta = tmp > originalHeight ? float(tmp - originalHeight) : 0.0f;
@@ -268,13 +291,16 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 						// PT: we pass "SWEEP_PASS_UP" for compatibility with previous code, but it's technically wrong (this is a 'down' pass)
 						if (doSweepTest(RecoverPoint, minDistance, SWEEP_PASS_UP, maxIter))
 						{
-							
+
 						}
 					}
-				//}
+					//}
+				}
 			}
 		}
-		m_bCollideGeomsUsingShapeBOX = false;
+		if (!walkExperiment && getType() == btControllerShapeType::eCAPSULE) {
+			m_bCollideGeomsUsingShapeBOX = false;
+		}
 	}
 
 	if (BULLET_CharacterController_DEBUG_LOG) {
@@ -343,7 +369,7 @@ bool btCharacterController::doSweepTest(const btVector3& disp, btScalar minDist,
 		// emit collision events
 		//
 
-		if (m_userControllerHitReport) {
+		if (m_userControllerHitReport ) {
 			if (sweepContact.mColliderObject->getInternalType() & btCollisionObject::CO_RIGID_BODY) {
 				btControllerShapeHit hit;
 				hit.controller = this;

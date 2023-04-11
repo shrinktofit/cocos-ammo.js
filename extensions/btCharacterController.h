@@ -79,6 +79,7 @@ protected:
 	bool m_bHitNonWalkable;
 	bool walkExperiment = false;
 	bool m_bDetectCollisions = true;
+	bool m_bOnlyDownTest = false;
 
 	// contact info
 	btScalar mContactPointHeight;
