@@ -87,14 +87,21 @@ public:
 		if (!convexResult.m_hitCollisionObject->hasContactResponse())
 			return btScalar(1.0);
 
-		const btCollisionShape* shape = convexResult.m_hitCollisionObject->getCollisionShape();
-		if (shape->isCompound()) {
-			const int index = convexResult.m_localShapeInfo->m_triangleIndex;
-			m_hitCollisionShape = ((btCompoundShape*)(shape))->getChildShape(index);
-		}
-		else {
-			m_hitCollisionShape = shape;
-		}
+		//const btCollisionShape* shape = convexResult.m_hitCollisionObject->getCollisionShape();
+		// if (shape->isCompound()) {
+		// 	if (convexResult.m_localShapeInfo->m_shapePart == -1) {
+		// 		const int index = convexResult.m_localShapeInfo->m_triangleIndex;
+		// 		m_hitCollisionShape = ((btCompoundShape*)(shape))->getChildShape(index);
+		// 	}
+		// 	else {//concave:TriangleMesh, HeightField
+		// 		const int index = convexResult.m_localShapeInfo->m_shapePart;
+		// 		m_hitCollisionShape = ((btCompoundShape*)(shape))->getChildShape(index);
+		// 	}
+		// }
+		// else {
+		// 	m_hitCollisionShape = shape;
+		// }
+		m_hitCollisionShape = convexResult.m_localShapeInfo->m_shapeTemp;
 
 		btVector3 hitNormalWorld;
 		if (normalInWorldSpace)
