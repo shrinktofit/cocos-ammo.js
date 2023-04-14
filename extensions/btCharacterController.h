@@ -80,6 +80,7 @@ protected:
 	bool walkExperiment = false;
 	bool m_bDetectCollisions = true;
 	bool m_bOnlyDownTest = false;
+	bool m_bDidAutoStep = false;
 
 	// contact info
 	btScalar mContactPointHeight;
@@ -88,7 +89,7 @@ protected:
 
 	//
 	btConvexShape* m_convexShapeBOX = nullptr; //only used for autoStep SWEEP_PASS_SIDE
-	bool m_bCollideGeomsUsingShapeBOX{false};
+	bool m_bCapsultCCTCollideGeomsUsingShapeBOX{false};
 
 	//keep track of the contact manifolds
 	btManifoldArray m_manifoldArray;//todo

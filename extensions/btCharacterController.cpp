@@ -137,9 +137,10 @@ btControllerCollisionFlag btCharacterController::move(const btVector3& disp, btS
 	// todo
 	//
 	m_halfHeight = getFullHalfHeight();	// UBI
+	m_bDidAutoStep = false;
 
 	//moveCharacter
-	//m_bCollideGeomsUsingShapeBOX = true;
+	//m_bCapsultCCTCollideGeomsUsingShapeBOX = true;
 	btVector3 backupPos = m_ghostObject->getWorldTransform().getOrigin();
 	btControllerCollisionFlag collisionFlag = moveCharacter(disp, minDist, elapsedTime);// , SweepTestFlag::STF_SWEEP_UP_SIDE_DOWN);
 	if(m_bHitNonWalkable){
@@ -149,14 +150,12 @@ btControllerCollisionFlag btCharacterController::move(const btVector3& disp, btS
 		walkExperiment = false;
 	}
 
-	//extra down movement for capsule cct
-	if(getType() == btControllerShapeType::eCAPSULE && (collisionFlag && btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_DOWN))
+	//extra down movement for capsule cct if it did autostep with boxshape
+	if(m_bDidAutoStep && getType() == btControllerShapeType::eCAPSULE && (collisionFlag && btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_DOWN))
 	{
-		//m_bCollideGeomsUsingShapeBOX = false;
 		m_bOnlyDownTest = true;
 		moveCharacter(disp, minDist, elapsedTime);// , SweepTestFlag::STF_SWEEP_SIDE_DOWN);
 		m_bOnlyDownTest = false;
-		//m_bCollideGeomsUsingShapeBOX = true;
 	}
 
 	if (BULLET_CharacterController_DEBUG_LOG) {
@@ -205,6 +204,12 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 
 	btVector3 SideVector = tangent_compo;
 	const bool sideVectorIsZero = !standingOnMovingUp && SideVector.fuzzyZero();
+	if (!sideVectorIsZero) {
+		m_bDidAutoStep = true;
+	}
+	else {
+		m_bDidAutoStep = false;
+	}
 
 	if (BULLET_CharacterController_DEBUG_LOG) {
 		printf("------moveCharacter------\n");
@@ -214,13 +219,13 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 	//UP
 	//doSweepTest
 	if(!walkExperiment && !m_bOnlyDownTest){//(mask & SweepTestFlag::STF_SWEEP_UP) {
-		if(!sideVectorIsZero)
-			UpVector += upDirection* m_stepHeight;
-
+		if (!sideVectorIsZero) {
+			UpVector += upDirection * m_stepHeight;
+		}
 		if (!UpVector.fuzzyZero()) {
 			if(BULLET_CharacterController_DEBUG_LOG) printf("");
 		}
-		m_bCollideGeomsUsingShapeBOX = false;
+		m_bCapsultCCTCollideGeomsUsingShapeBOX = false;
 		if(doSweepTest(UpVector, minDist, SweepPass::SWEEP_PASS_UP, maxIterUp)) {
 			collisionFlag = btControllerCollisionFlag(collisionFlag | btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_UP);
 			if (BULLET_CharacterController_DEBUG_LOG)
@@ -232,7 +237,7 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 	//doSweepTest
 	if(1 && !m_bOnlyDownTest){//(mask & SweepTestFlag::STF_SWEEP_SIDE) {
 		if (!walkExperiment && getType() == btControllerShapeType::eCAPSULE) {
-			m_bCollideGeomsUsingShapeBOX = true;
+			m_bCapsultCCTCollideGeomsUsingShapeBOX = true;
 		}
 		if(doSweepTest(SideVector, minDist, SweepPass::SWEEP_PASS_SIDE, maxIterSides)) {
 			collisionFlag = btControllerCollisionFlag(collisionFlag | btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_SIDES);
@@ -240,7 +245,7 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 			printf("doSweepTest SIDE collide\n");
 		}
 		if (!walkExperiment && getType() == btControllerShapeType::eCAPSULE) {
-			m_bCollideGeomsUsingShapeBOX = false;
+			m_bCapsultCCTCollideGeomsUsingShapeBOX = false;
 		}
 	}
 
@@ -251,10 +256,10 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 			DownVector -= upDirection * m_stepHeight;	// Undo our artificial up motion
 
 		if (!walkExperiment && getType() == btControllerShapeType::eCAPSULE) {
-			m_bCollideGeomsUsingShapeBOX = true;
+			m_bCapsultCCTCollideGeomsUsingShapeBOX = true;
 		}
-		if (m_bOnlyDownTest) {
-			m_bCollideGeomsUsingShapeBOX = false;
+		if (m_bOnlyDownTest || !m_bDidAutoStep) {
+			m_bCapsultCCTCollideGeomsUsingShapeBOX = false;
 		}
 
 		if(doSweepTest(DownVector, minDist, SweepPass::SWEEP_PASS_DOWN, maxIterDown)) {
@@ -279,7 +284,7 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 
 					if (!walkExperiment) {//not walk experiment
 						if (!m_bOnlyDownTest && !walkExperiment && getType() == btControllerShapeType::eCAPSULE) {
-							m_bCollideGeomsUsingShapeBOX = false;
+							m_bCapsultCCTCollideGeomsUsingShapeBOX = false;
 						}
 						return collisionFlag;
 					}
@@ -306,7 +311,7 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 			}
 		}
 		if (!walkExperiment && getType() == btControllerShapeType::eCAPSULE) {
-			m_bCollideGeomsUsingShapeBOX = false;
+			m_bCapsultCCTCollideGeomsUsingShapeBOX = false;
 		}
 	}
 
@@ -485,7 +490,7 @@ bool btCharacterController::collideGeoms(const btVector3& currentPosition, const
 	
 	//btConvexShape *convex_shape_test(static_cast<btConvexShape *>(m_ghostObject->getCollisionShape()));
 	btConvexShape *convex_shape_test(m_convexShape);
-	if (m_bCollideGeomsUsingShapeBOX) {
+	if (m_bCapsultCCTCollideGeomsUsingShapeBOX) {
 		convex_shape_test = m_convexShapeBOX;
 	}
 	btTransform shape_world_from = btTransform(btQuaternion::getIdentity(), currentPosition);
