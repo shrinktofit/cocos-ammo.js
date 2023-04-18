@@ -87,7 +87,7 @@ public:
 		if (!convexResult.m_hitCollisionObject->hasContactResponse())
 			return btScalar(1.0);
 
-		//const btCollisionShape* shape = convexResult.m_hitCollisionObject->getCollisionShape();
+		// const btCollisionShape* shape = convexResult.m_hitCollisionObject->getCollisionShape();
 		// if (shape->isCompound()) {
 		// 	if (convexResult.m_localShapeInfo->m_shapePart == -1) {
 		// 		const int index = convexResult.m_localShapeInfo->m_triangleIndex;
@@ -418,7 +418,7 @@ bool btCharacterController::doSweepTest(const btVector3& disp, btScalar minDist,
 		//
 		// recover From penetration/overlaps. 
 		//
-		if(sweepContact.mDistance == 0.0f) { //overlaps
+		if(m_bOverlapRecovery && sweepContact.mDistance == 0.0f) { //overlaps
 			if (BULLET_CharacterController_DEBUG_LOG)
 			printf("doSweepTest has penetration\n");
 			btVector3& temp = m_ghostObject->getWorldTransform().getOrigin();

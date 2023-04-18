@@ -59,6 +59,7 @@ public:
 	const btVector3& getPosition();
 
 	void setCollision(bool v) { m_bDetectCollisions = v; };
+	void setOverlapRecovery(bool v) { m_bOverlapRecovery = v; };
 
 protected:
 	btPairCachingGhostObject* m_ghostObject;
@@ -79,6 +80,7 @@ protected:
 	bool m_bHitNonWalkable;
 	bool walkExperiment = false;
 	bool m_bDetectCollisions = true;
+	bool m_bOverlapRecovery = true;
 	bool m_bOnlyDownTest = false;
 	bool m_bDidAutoStep = false;
 

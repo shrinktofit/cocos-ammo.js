@@ -233,6 +233,7 @@ declare namespace Bullet {
         CharacterController_setStepOffset(ptrCCT: ptr, v: number);
         CharacterController_setSlopeLimit(ptrCCT: ptr, v: number);
         CharacterController_setCollision(ptrCCT: ptr, collision: boolean);
+        CharacterController_setOverlapRecovery(ptrCCT: ptr, value: boolean);
         CapsuleCharacterControllerDesc_new(maxSlopeRadians: number, stepHeight: number, contactOffset: number, 
             ptrUpAxis: ptr, ptrInitPos: ptr, ptruUserControllerHitReport: ptr, radius: number, height: number): ptr;
         CapsuleCharacterController_new(collisionWorld: ptr, ptrBtCapsuleCharacterControllerDesc: ptr, userObjectPointer: ptr): ptr;
