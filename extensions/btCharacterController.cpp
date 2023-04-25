@@ -437,13 +437,9 @@ bool btCharacterController::doSweepTest(const btVector3& disp, btScalar minDist,
 		if (BULLET_CharacterController_DEBUG_LOG)
 		printf("doSweepTest doesn't have penetration\n");
 
-
-		
-		// update currentPosition
-		if(sweepContact.mDistance > m_contactOffset)
-			currentPosition += currentDirection * (sweepContact.mDistance - m_contactOffset);
+		currentPosition += currentDirection * (sweepContact.mDistance - m_contactOffset);
 		if (BULLET_CharacterController_DEBUG_LOG)
-		printf("doSweepTest update currentPosition to \n%f %f %f\n", currentPosition.x(), currentPosition.y(), currentPosition.z());
+			printf("doSweepTest update currentPosition to \n%f %f %f\n", currentPosition.x(), currentPosition.y(), currentPosition.z());
 
 		//
 		//	
@@ -493,9 +489,10 @@ bool btCharacterController::collideGeoms(const btVector3& currentPosition, const
 	if (m_bCapsultCCTCollideGeomsUsingShapeBOX) {
 		convex_shape_test = m_convexShapeBOX;
 	}
+	btScalar targetSweepDistance = sweepContact.mDistance;
 	btTransform shape_world_from = btTransform(btQuaternion::getIdentity(), currentPosition);
 	//btTransform shape_world_to = btTransform(btQuaternion(), targetPosition);//currentPosition + currentDirection * sweepContact.mDistance);
-	btTransform shape_world_to = btTransform(btQuaternion::getIdentity(), currentPosition + (targetPosition - currentPosition).normalize() * sweepContact.mDistance);
+	btTransform shape_world_to = btTransform(btQuaternion::getIdentity(), currentPosition + (targetPosition - currentPosition).normalize() * targetSweepDistance);
 
 	btKinematicClosestNotMeConvexResultCallback btResult(currentPosition, targetPosition, m_ghostObject);
 	btResult.m_collisionFilterGroup = m_ghostObject->getBroadphaseHandle()->m_collisionFilterGroup;
@@ -507,7 +504,8 @@ bool btCharacterController::collideGeoms(const btVector3& currentPosition, const
 		hasCollide = true;
 		
 		//btScalar mtd = (btResult.m_hitPointWorld - currentPosition).length();
-		btScalar mtd = (targetPosition - currentPosition).length() * btResult.m_closestHitFraction;
+		//btScalar mtd = (targetPosition - currentPosition).length() * btResult.m_closestHitFraction;
+		btScalar mtd = targetSweepDistance * btResult.m_closestHitFraction;
 		sweepContact.mWorldPos = btResult.m_hitPointWorld;
 		sweepContact.mWorldNormal = btResult.m_hitNormalWorld;
 		if (sweepContact.mWorldNormal.fuzzyZero()) {
