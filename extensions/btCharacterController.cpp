@@ -289,22 +289,22 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 						return collisionFlag;
 					}
 					else {//walk experiment
-						btVector3 currentPosition = m_ghostObject->getWorldTransform().getOrigin();
-						const float tmp = currentPosition.dot(upDirection);
-						float Delta = tmp > originalHeight ? float(tmp - originalHeight) : 0.0f;
-						Delta += fabsf(disp.dot(upDirection));
-						float Recover = Delta;
+						//btVector3 currentPosition = m_ghostObject->getWorldTransform().getOrigin();
+						//const float tmp = currentPosition.dot(upDirection);
+						//float Delta = tmp > originalHeight ? float(tmp - originalHeight) : 0.0f;
+						//Delta += fabsf(disp.dot(upDirection));
+						//float Recover = Delta;
 
-						const float minDistance = Recover < minDist ? Recover / float(maxIter) : minDist;
+						//const float minDistance = Recover < minDist ? Recover / float(maxIter) : minDist;
 
-						btVector3 RecoverPoint(0, 0, 0);
-						RecoverPoint = -upDirection * Recover;
+						//btVector3 RecoverPoint(0, 0, 0);
+						//RecoverPoint = -upDirection * Recover;
 
-						// PT: we pass "SWEEP_PASS_UP" for compatibility with previous code, but it's technically wrong (this is a 'down' pass)
-						if (doSweepTest(RecoverPoint, minDistance, SWEEP_PASS_UP, maxIter))
-						{
+						//// PT: we pass "SWEEP_PASS_UP" for compatibility with previous code, but it's technically wrong (this is a 'down' pass)
+						//if (doSweepTest(RecoverPoint, minDistance, SWEEP_PASS_UP, maxIter))
+						//{
 
-						}
+						//}
 					}
 					//}
 				}
@@ -673,44 +673,69 @@ const btVector3& btCharacterController::getPosition() {
 
 btCapsuleCharacterController::btCapsuleCharacterController(btCollisionWorld* collisionWorld, btCapsuleCharacterControllerDesc* desc, void* userObjectPointer)
 	:btCharacterController(collisionWorld, desc, userObjectPointer) {
-	m_convexShape = new btCapsuleShape(desc->m_fRadius, desc->m_fHeight);
+	m_fRadius = desc->m_fRadius;
+	m_fHeight = desc->m_fHeight;
 	m_ghostObject = new btPairCachingGhostObject();
-	m_ghostObject->setCollisionShape(m_convexShape);
 	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	m_ghostObject->getWorldTransform().setOrigin(desc->m_initPos);
 	m_ghostObject->setUserPointer(this);
 
-	btVector3 halfExtent(desc->m_fRadius, desc->m_fHeight * 0.5f + desc->m_fRadius, desc->m_fRadius);
-	m_convexShapeBOX = new btBoxShape(halfExtent);
+	ResetShape();
 }
 
 btScalar btCapsuleCharacterController::getFullHalfHeight() {
-	btCapsuleShape* capsule = (btCapsuleShape*)m_convexShape;
-	return capsule->getRadius() + capsule->getHalfHeight();
+	return m_fRadius + m_fHeight * 0.5f;
+}
+
+void btCapsuleCharacterController::ResetShape() {
+	if (m_convexShape) {
+		delete m_convexShape;
+		m_convexShape = NULL;
+	}
+	m_convexShape = new btCapsuleShape(m_fRadius, m_fHeight);
+
+	m_ghostObject->setCollisionShape(m_convexShape);
+
+	if (m_convexShapeBOX) {
+		delete m_convexShapeBOX;
+		m_convexShapeBOX = NULL;
+	}
+	btVector3 halfExtent(m_fRadius, getFullHalfHeight(), m_fRadius);
+	m_convexShapeBOX = new btBoxShape(halfExtent);
 }
 
 void btCapsuleCharacterController::setRadius(btScalar radius) {
-	btCapsuleShape* capsule = (btCapsuleShape*)m_convexShape;
-	//assume capsule is along Y axis
-	capsule->setImplicitShapeDimensions(btVector3(radius, capsule->getHalfHeight(), radius));
-	capsule->setMargin(radius);
+	m_fRadius = radius;
+	ResetShape();
 }
 
 void btCapsuleCharacterController::setHeight(btScalar height) {
-	btCapsuleShape* capsule = (btCapsuleShape*)m_convexShape;
-	btScalar radius = capsule->getRadius();
-	capsule->setImplicitShapeDimensions(btVector3(radius, height * 0.5, radius));
+	m_fHeight = height;
+	ResetShape();
 }
 
 btBoxCharacterController::btBoxCharacterController(btCollisionWorld* collisionWorld, btBoxCharacterControllerDesc* desc, void* userObjectPointer)
 	:btCharacterController(collisionWorld, desc, userObjectPointer) {
-	btVector3 halfExtent(desc->m_fHalfSideExtent, desc->m_fHalfHeight, desc->m_fHalfForwardExtent);//temp?
-	m_convexShape = new btBoxShape(halfExtent);
+	m_fHalfSideExtent = desc->m_fHalfSideExtent;
+	m_fHalfHeight = desc->m_fHalfHeight;
+	m_fHalfForwardExtent = desc->m_fHalfForwardExtent;
 	m_ghostObject = new btPairCachingGhostObject();
-	m_ghostObject->setCollisionShape(m_convexShape);
 	m_ghostObject->setCollisionFlags(btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	m_ghostObject->getWorldTransform().setOrigin(desc->m_initPos);
 	m_ghostObject->setUserPointer(this);
+
+	ResetShape();
+}
+
+void btBoxCharacterController::ResetShape() {
+	if (m_convexShape) {
+		delete m_convexShape;
+		m_convexShape = NULL;
+	}
+	btVector3 halfExtent(m_fHalfSideExtent, m_fHalfHeight, m_fHalfForwardExtent);
+	m_convexShape = new btBoxShape(halfExtent);
+
+	m_ghostObject->setCollisionShape(m_convexShape);
 }
 
 btScalar btBoxCharacterController::getFullHalfHeight() {
@@ -719,22 +744,16 @@ btScalar btBoxCharacterController::getFullHalfHeight() {
 }
 
 void btBoxCharacterController::setHalfHeight(btScalar halfHeight) {
-	btBoxShape* box = (btBoxShape*)m_convexShape;
-	auto dim = box->getImplicitShapeDimensions();
-	dim.setY(halfHeight);
-	return box->setImplicitShapeDimensions(dim);
+	m_fHalfHeight = halfHeight;
+	ResetShape();
 }
 
 void btBoxCharacterController::setHalfSideExtent(btScalar halfSideExtent) {
-	btBoxShape* box = (btBoxShape*)m_convexShape;
-	auto dim = box->getImplicitShapeDimensions();
-	dim.setX(halfSideExtent);
-	return box->setImplicitShapeDimensions(dim);
+	m_fHalfSideExtent = halfSideExtent;
+	ResetShape();
 }
 
 void btBoxCharacterController::setHalfForwardExtent(btScalar halfForwardExtent) {
-	btBoxShape* box = (btBoxShape*)m_convexShape;
-	auto dim = box->getImplicitShapeDimensions();
-	dim.setZ(halfForwardExtent);
-	return box->setImplicitShapeDimensions(dim);
+	m_fHalfForwardExtent = halfForwardExtent;
+	ResetShape();
 }
