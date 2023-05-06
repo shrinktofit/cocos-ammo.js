@@ -357,11 +357,13 @@ public:
 		btScalar	m_closestHitFraction;
 		int	m_collisionFilterGroup;
 		int	m_collisionFilterMask;
-		
+		const btCollisionObject*	m_hitCollisionObject;
+
 		ConvexResultCallback()
 			:m_closestHitFraction(btScalar(1.)),
 			m_collisionFilterGroup(btBroadphaseProxy::DefaultFilter),
-			m_collisionFilterMask(btBroadphaseProxy::AllFilter)
+			m_collisionFilterMask(btBroadphaseProxy::AllFilter),
+			m_hitCollisionObject(0)
 		{
 		}
 
@@ -371,7 +373,7 @@ public:
 		
 		bool	hasHit() const
 		{
-			return (m_closestHitFraction < btScalar(1.));
+			return (m_hitCollisionObject != 0);
 		}
 
 		
@@ -390,8 +392,7 @@ public:
 	{
 		ClosestConvexResultCallback(const btVector3&	convexFromWorld,const btVector3&	convexToWorld)
 		:m_convexFromWorld(convexFromWorld),
-		m_convexToWorld(convexToWorld),
-		m_hitCollisionObject(0)
+		m_convexToWorld(convexToWorld)
 		{
 		}
 
@@ -400,7 +401,6 @@ public:
 
 		btVector3	m_hitNormalWorld;
 		btVector3	m_hitPointWorld;
-		const btCollisionObject*	m_hitCollisionObject;
 		
 		virtual	btScalar	addSingleResult(LocalConvexResult& convexResult,bool normalInWorldSpace)
 		{
@@ -441,7 +441,8 @@ public:
 		
 		virtual	btScalar	addSingleResult(LocalConvexResult& convexResult,bool normalInWorldSpace)
 		{	
-			m_collisionObjects.push_back(convexResult.m_hitCollisionObject);
+			m_hitCollisionObject = convexResult.m_hitCollisionObject;
+			m_collisionObjects.push_back(m_hitCollisionObject);
 			btVector3 hitNormalWorld;
 			if (normalInWorldSpace)
 			{
@@ -449,7 +450,7 @@ public:
 			} else
 			{
 				///need to transform normal into worldspace
-				hitNormalWorld = convexResult.m_hitCollisionObject->getWorldTransform().getBasis()*convexResult.m_hitNormalLocal;
+				hitNormalWorld = m_hitCollisionObject->getWorldTransform().getBasis()*convexResult.m_hitNormalLocal;
 			}
 			m_hitNormalWorld.push_back(hitNormalWorld);
 			m_hitPointWorld.push_back(convexResult.m_hitPointLocal);
