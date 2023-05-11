@@ -214,6 +214,8 @@ declare namespace Bullet {
         DynamicsWorld_removeRigidBody(p: ptr, body: ptr): void;
         DynamicsWorld_addConstraint(p: ptr, p2: ptr, v: boolean): void;
         DynamicsWorld_removeConstraint(p: ptr, p2: ptr): void;
+        DynamicsWorld_addAction(p: ptr, action: ptr): void;
+        DynamicsWorld_removeAction(p: ptr, action: ptr): void;
 
         RayCallback_hasHit(p: ptr): boolean;
 
@@ -233,6 +235,35 @@ declare namespace Bullet {
 
         ccMaterial_new(): ptr;
         ccMaterial_set(p: ptr, r: number, f: number, rf: number, sf: number): void;
+
+        // CharacterController
+        ControllerHitReport_new(): ptr;
+        CharacterController_getGhostObject(ptrCCT: ptr): ptr;
+        ControllerHit_getCurrentController(ptr: ptr): ptr;
+        ControllerHit_getHitWorldPos(ptr: ptr): ptr;
+        ControllerHit_getHitWorldNormal(ptr: ptr): ptr;
+        ControllerHit_getHitMotionDir(ptr: ptr): ptr;         //CCT hit Motion direction
+        ControllerHit_getHitMotionLength(ptr: ptr): number;   //CCT hit Motion length
+        ControllerShapeHit_getHitShape(ptr: ptr): ptr;
+        ControllerShapeHit_getHitCollisionObject(ptr: ptr): ptr;
+        CharacterController_move(ptrCCT: ptr, ptrMovement: ptr, minDist: number, deltaTime: number):number;
+        CharacterController_getPosition(ptrCCT: ptr);
+        CharacterController_setContactOffset(ptrCCT: ptr, v: number);
+        CharacterController_setStepOffset(ptrCCT: ptr, v: number);
+        CharacterController_setSlopeLimit(ptrCCT: ptr, v: number);
+        CharacterController_setCollision(ptrCCT: ptr, collision: boolean);
+        CharacterController_setOverlapRecovery(ptrCCT: ptr, value: boolean);
+        CapsuleCharacterControllerDesc_new(maxSlopeRadians: number, stepHeight: number, contactOffset: number, 
+            ptrUpAxis: ptr, ptrInitPos: ptr, ptruUserControllerHitReport: ptr, radius: number, height: number): ptr;
+        CapsuleCharacterController_new(collisionWorld: ptr, ptrBtCapsuleCharacterControllerDesc: ptr, userObjectPointer: ptr): ptr;
+        CapsuleCharacterController_setRadius(ptrCCT: ptr, radius: number): void;
+        CapsuleCharacterController_setHeight(ptrCCT: ptr, height: number): void;
+        BoxCharacterControllerDesc_new(maxSlopeRadians: number, stepHeight: number, contactOffset: number, 
+            ptrUpAxis: ptr, ptrInitPos: ptr, ptruUserControllerHitReport: ptr, halfHeight: number, halfSideExtent: number, halfForwardExtent: number): ptr;
+        BoxCharacterController_new(collisionWorld: ptr, ptrBtBoxCharacterControllerDesc: ptr, userObjectPointer: ptr): ptr;
+        BoxCharacterController_setHalfHeight(ptrCCT: ptr, v: number): void;
+        BoxCharacterController_setHalfSideExtent(ptrCCT: ptr, v: number): void;
+        BoxCharacterController_setHalfForwardExtent(ptrCCT: ptr, v: number): void;
     }
 }
 
