@@ -62,8 +62,8 @@ public:
 	void setOverlapRecovery(bool v) { m_bOverlapRecovery = v; };
 
 protected:
-	btPairCachingGhostObject* m_ghostObject;
-	btConvexShape* m_convexShape;  //is also in m_ghostObject, but it needs to be convex, so we store it here to avoid upcast
+	btPairCachingGhostObject* m_ghostObject{ nullptr };
+	btConvexShape* m_convexShape{nullptr};  //is also in m_ghostObject, but it needs to be convex, so we store it here to avoid upcast
 	btCollisionWorld* m_collisionWorld;
 	btScalar m_halfHeight;
 	btUserControllerHitReport* m_userControllerHitReport{nullptr};
@@ -112,8 +112,12 @@ public:
 	btCapsuleCharacterController(btCollisionWorld* collisionWorld, btCapsuleCharacterControllerDesc* desc, void* userObjectPointer);
 	virtual btScalar getFullHalfHeight() override;
 	void setRadius(btScalar radius);
+	void ResetShape();
 	// distance between two sphere center
-	void setHeight(btScalar height);
+	void setHeight(btScalar height); 
+private:
+	float m_fRadius = 0.5;
+	float m_fHeight = 1;
 };
 
 class btBoxCharacterController : public btCharacterController {
@@ -121,7 +125,12 @@ public:
 	btBoxCharacterController(btCollisionWorld* collisionWorld, btBoxCharacterControllerDesc* desc, void* userObjectPointer);
 	virtual btScalar getFullHalfHeight() override;
 
+	void ResetShape();
 	void setHalfHeight(btScalar halfHeight);
 	void setHalfSideExtent(btScalar halfSideExtent);
 	void setHalfForwardExtent(btScalar halfForwardExtent);
+private:
+	btScalar m_fHalfHeight = 0.5;
+	btScalar m_fHalfSideExtent = 0.5;
+	btScalar m_fHalfForwardExtent = 0.5;
 };

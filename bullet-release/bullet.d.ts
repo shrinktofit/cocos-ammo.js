@@ -205,6 +205,7 @@ declare namespace Bullet {
         CollisionWorld_addCollisionObject(p: ptr, body: ptr, g: number, m: number): void;
         CollisionWorld_removeCollisionObject(p: ptr, body: ptr): void;
         CollisionWorld_rayTest(p: ptr, p0: ptr, p1: ptr, p2: ptr): void;
+        CollisionWorld_convexSweepTest(p: ptr, castShape: ptr, from: ptr, to: ptr, resultCallback: ptr, allowedCcdPenetration: ptr): void;
 
         ccDiscreteDynamicsWorld_new(dispatcher: ptr, pairCache: ptr, solver: ptr): ptr;
         ccDiscreteDynamicsWorld_setAllowSleep(p: ptr, v: boolean): void;
@@ -218,6 +219,7 @@ declare namespace Bullet {
         DynamicsWorld_removeAction(p: ptr, action: ptr): void;
 
         RayCallback_hasHit(p: ptr): boolean;
+        ConvexCallback_hasHit(p: ptr): boolean;
 
         ccAllRayCallback_static(): ptr;
         ccAllRayCallback_setFlags(p: ptr, flag: number): void;
@@ -232,6 +234,18 @@ declare namespace Bullet {
         ccClosestRayCallback_getHitPointWorld(p: ptr): ptr;
         ccClosestRayCallback_getHitNormalWorld(p: ptr): ptr;
         ccClosestRayCallback_getCollisionShapePtr(p: ptr): ptr;
+
+        ccAllConvexCallback_static(): ptr;
+        ccAllConvexCallback_reset(p: ptr, p0: ptr, p1: ptr, m: number, q: boolean): void;
+        ccAllConvexCallback_getHitPointWorld(p: ptr): ptr;
+        ccAllConvexCallback_getHitNormalWorld(p: ptr): ptr;
+        ccAllConvexCallback_getCollisionShapePtrs(p: ptr): ptr;
+
+        ccClosestConvexCallback_static(): ptr;
+        ccClosestConvexCallback_reset(p: ptr, p0: ptr, p1: ptr, m: number, q: boolean): void;
+        ccClosestConvexCallback_getHitPointWorld(p: ptr): ptr;
+        ccClosestConvexCallback_getHitNormalWorld(p: ptr): ptr;
+        ccClosestConvexCallback_getCollisionShapePtr(p: ptr): ptr;
 
         ccMaterial_new(): ptr;
         ccMaterial_set(p: ptr, r: number, f: number, rf: number, sf: number): void;
