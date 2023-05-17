@@ -122,6 +122,17 @@ protected:
 	btCollisionObject* m_me;
 };
 
+void btCharacterController::logMovementChange()
+{
+	if (BULLET_CharacterController_DEBUG_LOG) {
+		btVector3 finalPos = m_ghostObject->getWorldTransform().getOrigin();
+		btVector3 finalMovement = finalPos - m_backupPos;
+		printf("initi pos \t %f %f %f\n", m_backupPos.x(), m_backupPos.y(), m_backupPos.z());
+		printf("current pos \t %f %f %f\n", finalPos.x(), finalPos.y(), finalPos.z());
+		printf("movement\t %f %f %f\n", finalMovement.x(), finalMovement.y(), finalMovement.z());
+	}
+}
+
 btControllerCollisionFlag btCharacterController::move(const btVector3& disp, btScalar minDist, btScalar elapsedTime) {
 	//if (disp.fuzzyZero()) { //can not do this, since even through disp is zero, cct still need to collide with env
 	//	return m_prevCollisionFlag;
@@ -129,7 +140,7 @@ btControllerCollisionFlag btCharacterController::move(const btVector3& disp, btS
 
 	if (BULLET_CharacterController_DEBUG_LOG) {
 		printf("-------------------\n");
-		printf("-------- move -----\n");
+		printf("---- move  START --\n");
 		printf("-------------------\n");
 	}
 
@@ -141,34 +152,49 @@ btControllerCollisionFlag btCharacterController::move(const btVector3& disp, btS
 
 	//moveCharacter
 	//m_bCapsultCCTCollideGeomsUsingShapeBOX = true;
-	btVector3 backupPos = m_ghostObject->getWorldTransform().getOrigin();
+	if (BULLET_CharacterController_DEBUG_LOG) {
+		printf("\n-------- PART 0: UP-SIDE-DOWN -----\n");
+	}
+	m_backupPos = m_ghostObject->getWorldTransform().getOrigin();
 	btControllerCollisionFlag collisionFlag = moveCharacter(disp, minDist, elapsedTime);// , SweepTestFlag::STF_SWEEP_UP_SIDE_DOWN);
+	if (BULLET_CharacterController_DEBUG_LOG) {
+		printf("-------- PART 0: UP-SIDE-DOWN END -\n");
+	}
+	logMovementChange();
+
 	if(m_bHitNonWalkable){
+		if (BULLET_CharacterController_DEBUG_LOG) {
+			printf("\n---- PART 1: WALK EXP:SIDE-DOWN ---\n");
+		}
 		walkExperiment = true;
-		m_ghostObject->getWorldTransform().setOrigin(backupPos);
+		m_ghostObject->getWorldTransform().setOrigin(m_backupPos);
 		collisionFlag = moveCharacter(disp, minDist, elapsedTime);// , SweepTestFlag::STF_SWEEP_SIDE_DOWN);
 		walkExperiment = false;
+		if (BULLET_CharacterController_DEBUG_LOG) {
+			printf("---- PART 1: WALK EXP:SIDE-DOWN END\n");
+		}
+		logMovementChange();
 	}
 
 	//extra down movement for capsule cct if it did autostep with boxshape
 	if(m_bDidAutoStep && getType() == btControllerShapeType::eCAPSULE && (collisionFlag && btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_DOWN))
 	{
+		if (BULLET_CharacterController_DEBUG_LOG) {
+			printf("\n---- PART 2: Extra Down for CAPS --\n");
+		}
 		m_bOnlyDownTest = true;
 		moveCharacter(disp, minDist, elapsedTime);// , SweepTestFlag::STF_SWEEP_SIDE_DOWN);
 		m_bOnlyDownTest = false;
+		if (BULLET_CharacterController_DEBUG_LOG) {
+			printf("---- PART 2: Extra Down for CAPS END\n");
+		}
+		logMovementChange();
 	}
 
 	if (BULLET_CharacterController_DEBUG_LOG) {
-		btVector3 finalPos = m_ghostObject->getWorldTransform().getOrigin();
-		btVector3 finalDisp = finalPos - backupPos;
-		if (finalDisp.length() > 0.1) {
-			printf("");
-		}
-		printf("move initi disp\t \n%f %f %f\n", disp.x(), disp.y(), disp.z());
-		printf("move final disp\t \n%f %f %f\n", finalDisp.x(), finalDisp.y(), finalDisp.z());
 		printf("-------------------\n");
 		printf("----- move END ----\n");
-		printf("-------------------\n");
+		printf("-------------------\n\n\n\n");
 	}
 	m_prevCollisionFlag = collisionFlag;
 	return collisionFlag;
@@ -437,10 +463,11 @@ bool btCharacterController::doSweepTest(const btVector3& disp, btScalar minDist,
 		if (BULLET_CharacterController_DEBUG_LOG)
 		printf("doSweepTest doesn't have penetration\n");
 
-		currentPosition += currentDirection * (sweepContact.mDistance - m_contactOffset);
-		if (BULLET_CharacterController_DEBUG_LOG)
-			printf("doSweepTest update currentPosition to \n%f %f %f\n", currentPosition.x(), currentPosition.y(), currentPosition.z());
-
+		if (sweepContact.mDistance - m_contactOffset > 0) {
+			currentPosition += currentDirection * (sweepContact.mDistance - m_contactOffset);
+			if (BULLET_CharacterController_DEBUG_LOG)
+				printf("doSweepTest update currentPosition to \n%f %f %f\n", currentPosition.x(), currentPosition.y(), currentPosition.z());
+		}
 		//
 		//	
 		//	
@@ -487,7 +514,13 @@ bool btCharacterController::collideGeoms(const btVector3& currentPosition, const
 	//btConvexShape *convex_shape_test(static_cast<btConvexShape *>(m_ghostObject->getCollisionShape()));
 	btConvexShape *convex_shape_test(m_convexShape);
 	if (m_bCapsultCCTCollideGeomsUsingShapeBOX) {
+		if (BULLET_CharacterController_DEBUG_LOG)
+			printf("collideGeoms using Box Shape\n");
 		convex_shape_test = m_convexShapeBOX;
+	}
+	else {
+		if (BULLET_CharacterController_DEBUG_LOG)
+			printf("collideGeoms using Calsule Shape\n");
 	}
 	btScalar targetSweepDistance = sweepContact.mDistance;
 	btTransform shape_world_from = btTransform(btQuaternion::getIdentity(), currentPosition);
