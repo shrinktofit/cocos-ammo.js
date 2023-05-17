@@ -1,11 +1,11 @@
 {
   "name": "@cocos/bullet",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "",
   "main": "bullet.cocos.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "minify": "uglifyjs bullet.asm.js -c -m -o bullet.asm.min.js",
+    "minify": "uglifyjs bullet.asm.js -m -c -o bullet.asm.min.js",
     "transform": "babel --plugins @babel/plugin-transform-modules-umd --module-id=bullet --minified bullet.temp.js -o bullet.cocos.js",
     "build": "npm run minify && node port.js && npm run transform",
     "postpublish": "cnpm sync @cocos/bullet",

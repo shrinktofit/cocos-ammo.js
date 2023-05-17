@@ -2,6 +2,7 @@
 #include "ccDiscreteDynamicsWorld.h"
 #include "BulletCollision/CollisionShapes/btSphereShape.h"
 #include "BulletDynamics/Dynamics/btRigidBody.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "LinearMath/btQuickprof.h"
 #include "LinearMath/btScalar.h"
 #include "LinearMath/btVector3.h"
@@ -19,6 +20,7 @@ ccDiscreteDynamicsWorld::ccDiscreteDynamicsWorld(
   // gDeactivationTime = btScalar(1);
   m_dispatchInfo.m_allowedCcdPenetration = btScalar(0.01);
   getPairCache()->setOverlapFilterCallback(&m_overlapFilterCallback);
+  getPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
 }
 
 void ccDiscreteDynamicsWorld::applyGravity() {
