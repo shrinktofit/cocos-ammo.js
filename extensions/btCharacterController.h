@@ -27,6 +27,8 @@ public:
 
 	virtual		btControllerShapeType::Enum	getType() { return mType; };
 
+	void logMovementChange();
+
 	//
 	// Move the Character with a displacement.
 	// Normally call this func every frame with a displacement of velocity * deltaTime
@@ -97,6 +99,7 @@ protected:
 	btManifoldArray m_manifoldArray;//todo
 
 	btControllerCollisionFlag m_prevCollisionFlag;
+	btVector3 m_backupPos;
 
 	// internal functions called by move()
 	btControllerCollisionFlag moveCharacter(const btVector3& disp, btScalar minDist, btScalar elapsedTime);
