@@ -149,6 +149,7 @@ btControllerCollisionFlag btCharacterController::move(const btVector3& disp, btS
 	//
 	m_halfHeight = getFullHalfHeight();	// UBI
 	m_bDidAutoStep = false;
+	m_contactOffset = btMax(m_contactOffset, 0.01f);
 
 	//moveCharacter
 	//m_bCapsultCCTCollideGeomsUsingShapeBOX = true;
