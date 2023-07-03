@@ -51,6 +51,7 @@ public:
 	btScalar getMaxSlope() const;
 
 	btPairCachingGhostObject* getGhostObject() { return m_ghostObject; };
+	btCollisionShape* getCollisionShape() { return (btCollisionShape*)m_convexShape; };
 	void* getUserPointer() { return m_userObjectPointer; };
 	void setUserPointer(void* userPointer) { m_userObjectPointer = userPointer;}
 
