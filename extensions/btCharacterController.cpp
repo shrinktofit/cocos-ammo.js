@@ -178,7 +178,7 @@ btControllerCollisionFlag btCharacterController::move(const btVector3& disp, btS
 	}
 
 	//extra down movement for capsule cct if it did autostep with boxshape
-	if(m_bDidAutoStep && getType() == btControllerShapeType::eCAPSULE && (collisionFlag && btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_DOWN))
+	if(m_bDidAutoStep && getType() == btControllerShapeType::eCAPSULE && (collisionFlag & btControllerCollisionFlag::BULLET_CONTROLLER_COLLISION_DOWN))
 	{
 		if (BULLET_CharacterController_DEBUG_LOG) {
 			printf("\n---- PART 2: Extra Down for CAPS --\n");
@@ -207,7 +207,7 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 	btControllerCollisionFlag collisionFlag = (btControllerCollisionFlag)0;
 	//btVector3& temp = m_ghostObject->getWorldTransform().getOrigin();
 
-	btVector3 currentPosition = m_ghostObject->getWorldTransform().getOrigin();
+	//btVector3 currentPosition = m_ghostObject->getWorldTransform().getOrigin();
 
 	const int maxIter = MAX_ITER;	// 1 for "collide and stop"
 	const int maxIterUp = maxIter;
@@ -216,7 +216,7 @@ btControllerCollisionFlag btCharacterController::moveCharacter(const btVector3& 
 
 	// Save initial height
 	const btVector3& upDirection = m_up;
-	const btScalar originalHeight = currentPosition.dot(upDirection);
+	//const btScalar originalHeight = currentPosition.dot(upDirection);
     //const btScalar originalBottomPoint = originalHeight - m_halfHeight;	// UBI
 
 	btVector3 UpVector(0.0f, 0.0f, 0.0f);
@@ -722,20 +722,25 @@ btScalar btCapsuleCharacterController::getFullHalfHeight() {
 }
 
 void btCapsuleCharacterController::ResetShape() {
-	if (m_convexShape) {
-		delete m_convexShape;
-		m_convexShape = NULL;
+	if(!m_convexShape) {
+		m_convexShape = new btCapsuleShape(m_fRadius, m_fHeight);
+	}else{
+		((btCapsuleShape*)m_convexShape)->updateProp(m_fRadius, m_fHeight * 0.5, 1/*upAxis*/);
 	}
-	m_convexShape = new btCapsuleShape(m_fRadius, m_fHeight);
-
+	
 	m_ghostObject->setCollisionShape(m_convexShape);
 
-	if (m_convexShapeBOX) {
-		delete m_convexShapeBOX;
-		m_convexShapeBOX = NULL;
-	}
+	// if (m_convexShapeBOX) {
+	// 	delete m_convexShapeBOX;
+	// 	m_convexShapeBOX = NULL;
+	// }
 	btVector3 halfExtent(m_fRadius, getFullHalfHeight(), m_fRadius);
-	m_convexShapeBOX = new btBoxShape(halfExtent);
+	// m_convexShapeBOX = new btBoxShape(halfExtent);
+	if(!m_convexShapeBOX) {
+	 m_convexShapeBOX = new btBoxShape(halfExtent);
+	} else {
+		((btBoxShape*)m_convexShapeBOX)->setUnscaledHalfExtents(halfExtent);
+	}
 }
 
 void btCapsuleCharacterController::setRadius(btScalar radius) {
@@ -762,12 +767,12 @@ btBoxCharacterController::btBoxCharacterController(btCollisionWorld* collisionWo
 }
 
 void btBoxCharacterController::ResetShape() {
-	if (m_convexShape) {
-		delete m_convexShape;
-		m_convexShape = NULL;
-	}
 	btVector3 halfExtent(m_fHalfSideExtent, m_fHalfHeight, m_fHalfForwardExtent);
-	m_convexShape = new btBoxShape(halfExtent);
+	if(!m_convexShape) {
+	 m_convexShape = new btBoxShape(halfExtent);
+	} else {
+		((btBoxShape*)m_convexShape)->setUnscaledHalfExtents(halfExtent);
+	}
 
 	m_ghostObject->setCollisionShape(m_convexShape);
 }
