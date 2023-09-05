@@ -38,7 +38,8 @@ class	btIDebugDraw
 		btVector3	m_disabledDeactivationObject;
 		btVector3	m_disabledSimulationObject;
 		btVector3	m_aabb;
-		btVector3 m_contactPoint;
+		btVector3   m_contactPoint;
+		btVector3   m_constraintLimit;
 		
 		DefaultColors()
 		:	m_activeObject(1,1,1),
@@ -47,7 +48,8 @@ class	btIDebugDraw
 			m_disabledDeactivationObject(1,0,0),
 			m_disabledSimulationObject(1,1,0),
 			m_aabb(1,0,0),
-			m_contactPoint(1,1,0)
+			m_contactPoint(1,1,0),
+			m_constraintLimit(0,0,0)
 		{
 		}
 	};

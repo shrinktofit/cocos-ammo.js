@@ -1175,6 +1175,8 @@ void	btDiscreteDynamicsWorld::startProfiling(btScalar timeStep)
 
 void btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint* constraint)
 {
+	btIDebugDraw::DefaultColors defaultColors = getDebugDrawer()->getDefaultColors();
+	btVector3 constraintLimitColor = defaultColors.m_constraintLimit;
 	bool drawFrames = (getDebugDrawer()->getDebugMode() & btIDebugDraw::DBG_DrawConstraints) != 0;
 	bool drawLimits = (getDebugDrawer()->getDebugMode() & btIDebugDraw::DBG_DrawConstraintLimits) != 0;
 	btScalar dbgDrawSize = constraint->getDbgDrawSize();
@@ -1226,7 +1228,7 @@ void btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint* constraint)
 					btVector3& center = tr.getOrigin();
 					btVector3 normal = tr.getBasis().getColumn(2);
 					btVector3 axis = tr.getBasis().getColumn(0);
-					getDebugDrawer()->drawArc(center, normal, axis, dbgDrawSize, dbgDrawSize, minAng, maxAng, btVector3(0,0,0), drawSect);
+					getDebugDrawer()->drawArc(center, normal, axis, dbgDrawSize, dbgDrawSize, minAng, maxAng, constraintLimitColor, drawSect);
 				}
 			}
 			break;
@@ -1250,10 +1252,10 @@ void btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint* constraint)
 						fAngleInRadians = btScalar(2.*3.1415926) * (btScalar)i/btScalar(nSegments);
 						btVector3 pCur = pCT->GetPointForAngle(fAngleInRadians, length);
 						pCur = tr * pCur;
-						getDebugDrawer()->drawLine(pPrev, pCur, btVector3(0,0,0));
+						getDebugDrawer()->drawLine(pPrev, pCur, constraintLimitColor);
 
 						if (i%(nSegments/8) == 0)
-							getDebugDrawer()->drawLine(tr.getOrigin(), pCur, btVector3(0,0,0));
+							getDebugDrawer()->drawLine(tr.getOrigin(), pCur, constraintLimitColor);
 
 						pPrev = pCur;
 					}
@@ -1271,7 +1273,7 @@ void btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint* constraint)
 					btVector3 pivot = tr.getOrigin();
 					btVector3 normal = tr.getBasis().getColumn(0);
 					btVector3 axis1 = tr.getBasis().getColumn(1);
-					getDebugDrawer()->drawArc(pivot, normal, axis1, dbgDrawSize, dbgDrawSize, -twa-tws, -twa+tws, btVector3(0,0,0), true);
+					getDebugDrawer()->drawArc(pivot, normal, axis1, dbgDrawSize, dbgDrawSize, -twa-tws, -twa+tws, constraintLimitColor, true);
 
 				}
 			}
@@ -1294,7 +1296,7 @@ void btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint* constraint)
 					btScalar maxTh = p6DOF->getRotationalLimitMotor(1)->m_hiLimit;
 					btScalar minPs = p6DOF->getRotationalLimitMotor(2)->m_loLimit;
 					btScalar maxPs = p6DOF->getRotationalLimitMotor(2)->m_hiLimit;
-					getDebugDrawer()->drawSpherePatch(center, up, axis, dbgDrawSize * btScalar(.9f), minTh, maxTh, minPs, maxPs, btVector3(0,0,0));
+					getDebugDrawer()->drawSpherePatch(center, up, axis, dbgDrawSize * btScalar(.9f), minTh, maxTh, minPs, maxPs, constraintLimitColor);
 					axis = tr.getBasis().getColumn(1);
 					btScalar ay = p6DOF->getAngle(1);
 					btScalar az = p6DOF->getAngle(2);
@@ -1312,16 +1314,16 @@ void btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint* constraint)
 					btScalar maxFi = p6DOF->getRotationalLimitMotor(0)->m_hiLimit;
 					if(minFi > maxFi)
 					{
-						getDebugDrawer()->drawArc(center, normal, ref, dbgDrawSize, dbgDrawSize, -SIMD_PI, SIMD_PI, btVector3(0,0,0), false);
+						getDebugDrawer()->drawArc(center, normal, ref, dbgDrawSize, dbgDrawSize, -SIMD_PI, SIMD_PI, constraintLimitColor, false);
 					}
 					else if(minFi < maxFi)
 					{
-						getDebugDrawer()->drawArc(center, normal, ref, dbgDrawSize, dbgDrawSize, minFi, maxFi, btVector3(0,0,0), true);
+						getDebugDrawer()->drawArc(center, normal, ref, dbgDrawSize, dbgDrawSize, minFi, maxFi, constraintLimitColor, true);
 					}
 					tr = p6DOF->getCalculatedTransformA();
 					btVector3 bbMin = p6DOF->getTranslationalLimitMotor()->m_lowerLimit;
 					btVector3 bbMax = p6DOF->getTranslationalLimitMotor()->m_upperLimit;
-					getDebugDrawer()->drawBox(bbMin, bbMax, tr, btVector3(0,0,0));
+					getDebugDrawer()->drawBox(bbMin, bbMax, tr, constraintLimitColor);
 				}
 			}
 			break;
@@ -1344,7 +1346,7 @@ void btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint* constraint)
 					btScalar maxTh = p6DOF->getRotationalLimitMotor(1)->m_hiLimit;
 					btScalar minPs = p6DOF->getRotationalLimitMotor(2)->m_loLimit;
 					btScalar maxPs = p6DOF->getRotationalLimitMotor(2)->m_hiLimit;
-					getDebugDrawer()->drawSpherePatch(center, up, axis, dbgDrawSize * btScalar(.9f), minTh, maxTh, minPs, maxPs, btVector3(0, 0, 0));
+					getDebugDrawer()->drawSpherePatch(center, up, axis, dbgDrawSize * btScalar(.9f), minTh, maxTh, minPs, maxPs, constraintLimitColor);
 					axis = tr.getBasis().getColumn(1);
 					btScalar ay = p6DOF->getAngle(1);
 					btScalar az = p6DOF->getAngle(2);
@@ -1362,16 +1364,16 @@ void btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint* constraint)
 					btScalar maxFi = p6DOF->getRotationalLimitMotor(0)->m_hiLimit;
 					if (minFi > maxFi)
 					{
-						getDebugDrawer()->drawArc(center, normal, ref, dbgDrawSize, dbgDrawSize, -SIMD_PI, SIMD_PI, btVector3(0, 0, 0), false);
+						getDebugDrawer()->drawArc(center, normal, ref, dbgDrawSize, dbgDrawSize, -SIMD_PI, SIMD_PI, constraintLimitColor, false);
 					}
 					else if (minFi < maxFi)
 					{
-						getDebugDrawer()->drawArc(center, normal, ref, dbgDrawSize, dbgDrawSize, minFi, maxFi, btVector3(0, 0, 0), true);
+						getDebugDrawer()->drawArc(center, normal, ref, dbgDrawSize, dbgDrawSize, minFi, maxFi, constraintLimitColor, true);
 					}
 					tr = p6DOF->getCalculatedTransformA();
 					btVector3 bbMin = p6DOF->getTranslationalLimitMotor()->m_lowerLimit;
 					btVector3 bbMax = p6DOF->getTranslationalLimitMotor()->m_upperLimit;
-					getDebugDrawer()->drawBox(bbMin, bbMax, tr, btVector3(0, 0, 0));
+					getDebugDrawer()->drawBox(bbMin, bbMax, tr, constraintLimitColor);
 				}
 			}
 			break;
@@ -1388,13 +1390,13 @@ void btDiscreteDynamicsWorld::debugDrawConstraint(btTypedConstraint* constraint)
 					btTransform tr = pSlider->getUseLinearReferenceFrameA() ? pSlider->getCalculatedTransformA() : pSlider->getCalculatedTransformB();
 					btVector3 li_min = tr * btVector3(pSlider->getLowerLinLimit(), 0.f, 0.f);
 					btVector3 li_max = tr * btVector3(pSlider->getUpperLinLimit(), 0.f, 0.f);
-					getDebugDrawer()->drawLine(li_min, li_max, btVector3(0, 0, 0));
+					getDebugDrawer()->drawLine(li_min, li_max, constraintLimitColor);
 					btVector3 normal = tr.getBasis().getColumn(0);
 					btVector3 axis = tr.getBasis().getColumn(1);
 					btScalar a_min = pSlider->getLowerAngLimit();
 					btScalar a_max = pSlider->getUpperAngLimit();
 					const btVector3& center = pSlider->getCalculatedTransformB().getOrigin();
-					getDebugDrawer()->drawArc(center, normal, axis, dbgDrawSize, dbgDrawSize, a_min, a_max, btVector3(0,0,0), true);
+					getDebugDrawer()->drawArc(center, normal, axis, dbgDrawSize, dbgDrawSize, a_min, a_max, constraintLimitColor, true);
 				}
 			}
 			break;

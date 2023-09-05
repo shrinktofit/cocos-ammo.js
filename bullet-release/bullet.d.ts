@@ -227,6 +227,14 @@ declare namespace Bullet {
         DebugDraw_new(): ptr;
         DebugDraw_setDebugMode(p: ptr, debugMode: number): void;
         DebugDraw_getDebugMode(p: ptr): number;
+        DebugDraw_setActiveObjectColor(p: ptr, r: number, g: number, b: number): void;
+        DebugDraw_setDeactiveObjectColor(p: ptr, r: number, g: number, b: number): void;
+        DebugDraw_setWantsDeactivationObjectColor(p: ptr, r: number, g: number, b: number): void;
+        DebugDraw_setDisabledDeactivationObjectColor(p: ptr, r: number, g: number, b: number): void;
+        DebugDraw_setDisabledSimulationObjectColor(p: ptr, r: number, g: number, b: number): void;
+        DebugDraw_setAABBColor(p: ptr, r: number, g: number, b: number): void;
+        DebugDraw_setContactPointColor(p: ptr, r: number, g: number, b: number): void;
+        DebugDraw_setConstraintLimitColor(p: ptr, r: number, g: number, b: number): void;
 
         RayCallback_hasHit(p: ptr): boolean;
         ConvexCallback_hasHit(p: ptr): boolean;
