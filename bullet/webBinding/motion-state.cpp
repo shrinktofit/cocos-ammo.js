@@ -4,22 +4,33 @@
 #include "LinearMath/btTransform.h"
 #include "macro.h"
 
-extern "C"
-{
-    void syncPhysicsToGraphics(const int id) DLL_IMPORT(syncPhysicsToGraphics);
-}
+// extern "C"
+// {
+//     void syncPhysicsToGraphics(const int id) DLL_IMPORT(syncPhysicsToGraphics);
+// }
 
 namespace cc
 {
 class ccMotionState : public btMotionState
 {
   public:
-    const int m_id;
+    int m_id;
     btTransform m_graphicsWorldTrans;
+
+    ccMotionState()
+    {
+        m_id= -1;
+    }
 
     ccMotionState(const int id, const btTransform &startTrans = btTransform::getIdentity())
     : m_id(id), m_graphicsWorldTrans(startTrans)
     {
+    }
+
+    void setup(const int id, const btTransform &startTrans = btTransform::getIdentity())
+    {
+        m_id = id;
+        m_graphicsWorldTrans = startTrans;
     }
 
     virtual void getWorldTransform(btTransform &centerOfMassWorldTrans) const
@@ -32,6 +43,8 @@ class ccMotionState : public btMotionState
         m_graphicsWorldTrans = centerOfMassWorldTrans;
         syncPhysicsToGraphics(m_id);
     }
+
+    virtual void syncPhysicsToGraphics(const int id) = 0;
 };
 } // namespace cc
 
@@ -59,9 +72,14 @@ extern "C"
         return int(ms);
     }
 
-    // ccMotionState
-    int DLL_EXPORT ccMotionState_new(int id, int ptr1)
+    // // ccMotionState
+    // int DLL_EXPORT ccMotionState_new(int id, int ptr1)
+    // {
+    //     return (int)new cc::ccMotionState(id, *(btTransform *)ptr1);
+    // }
+    void DLL_EXPORT ccMotionState_setup(int ptr, int id, int ptr1)
     {
-        return (int)new cc::ccMotionState(id, *(btTransform *)ptr1);
+        cc::ccMotionState *p = (cc::ccMotionState *)ptr;
+        p->setup(id, *(btTransform *)ptr1);
     }
 }

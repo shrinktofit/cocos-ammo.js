@@ -92,7 +92,7 @@ public:
 	*/
 	virtual void onControllerHit(const btControllersHit& hit) = 0;
 
-protected:
+// protected:
 	virtual ~btUserControllerHitReport() {}
 };
 

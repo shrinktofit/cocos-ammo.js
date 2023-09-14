@@ -12,11 +12,11 @@
 
 #include "macro.h"
 
-extern "C"
-{
-    void onShapeHitExt(const int hit, const int controller) DLL_IMPORT(onShapeHitExt);
-    // void onControllerHitExt(const int hit, const int controller) DLL_IMPORT(onControllerHit);
-}
+// extern "C"
+// {
+//     void onShapeHitExt(const int hit, const int controller) DLL_IMPORT(onShapeHitExt);
+//     // void onControllerHitExt(const int hit, const int controller) DLL_IMPORT(onControllerHit);
+// }
 
 class btControllerHitReport : public btUserControllerHitReport
 {
@@ -43,17 +43,19 @@ public:
         //onControllerHitExt((int)(&hit), (int)(hit.controller));
     };
 
-protected:
-    virtual ~btControllerHitReport() {}
+    virtual void onShapeHitExt(const int hit, const int controller) = 0;
+
+// protected:
+//     virtual ~btControllerHitReport() {}
 };
 
 extern "C"
 {
-    // btControllerHitReport
-    int DLL_EXPORT ControllerHitReport_new()
-    {
-        return (int)new btControllerHitReport();
-    }
+    // // btControllerHitReport
+    // int DLL_EXPORT ControllerHitReport_new()
+    // {
+    //     return (int)new btControllerHitReport();
+    // }
 
     int DLL_EXPORT ControllerHit_getHitWorldPos(int ptr)
     {

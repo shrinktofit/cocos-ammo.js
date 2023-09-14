@@ -17,13 +17,54 @@
 #include "motion-state.cpp"
 #include "rigid-body.cpp"
 
-
 using namespace emscripten;
+
+struct btDebugDrawWrapper : public wrapper<btDebugDraw> {
+        EMSCRIPTEN_WRAPPER(btDebugDrawWrapper)
+        void clearLines() override {
+                return call<void>("clearLines");
+        }
+        void flushLines() override {
+                return call<void>("flushLines");
+        }
+        void onDebugDrawLine(const int from, const int to, int color) override {
+                return call<void>("onDebugDrawLine", from, to, color);
+        }
+};
+
+struct btControllerHitReportWrapper : public wrapper<btControllerHitReport> {
+        EMSCRIPTEN_WRAPPER(btControllerHitReportWrapper)
+        void onShapeHitExt(const int hit, const int controller) override {
+                return call<void>("onShapeHitExt", hit, controller);
+        }
+};
+
+struct ccMotionStateWrapper : public wrapper<cc::ccMotionState> {
+        EMSCRIPTEN_WRAPPER(ccMotionStateWrapper)
+        void syncPhysicsToGraphics(const int id) override {
+                return call<void>("syncPhysicsToGraphics", id);
+        }
+};
 
 //
 //----------------------------------------------- START EMBINDING ------------------------------------------
 //
 EMSCRIPTEN_BINDINGS(bullet) {
+
+        //bind class 
+        class_<btDebugDraw>("DebugDraw")
+                .function("clearLines", &btDebugDraw::clearLines)
+                .function("flushLines", &btDebugDraw::flushLines)
+                .function("onDebugDrawLine", &btDebugDraw::onDebugDrawLine)
+                .allow_subclass<btDebugDrawWrapper>("DrawWrapper", constructor<>());
+
+        class_<btControllerHitReport>("ControllerHitReport")
+                .function("onShapeHitExt", &btControllerHitReport::onShapeHitExt)
+                .allow_subclass<btControllerHitReportWrapper>("ControllerHitReportWrapper", constructor<>());
+
+        class_<cc::ccMotionState>("MotionState")
+                .function("syncPhysicsToGraphics", &cc::ccMotionState::syncPhysicsToGraphics)
+                .allow_subclass<ccMotionStateWrapper>("MotionStateWrapper", constructor<>());
 
         //_malloc
         function("_malloc", &_malloc);
@@ -57,7 +98,8 @@ EMSCRIPTEN_BINDINGS(bullet) {
         //MotionState
         function("MotionState_getWorldTransform", &MotionState_getWorldTransform, allow_raw_pointers());
         function("MotionState_setWorldTransform", &MotionState_setWorldTransform, allow_raw_pointers());
-        function("ccMotionState_new", &ccMotionState_new, allow_raw_pointers());
+        // function("ccMotionState_new", &ccMotionState_new, allow_raw_pointers());
+        function("ccMotionState_setup", &ccMotionState_setup, allow_raw_pointers());
 
         //int_array
         function("int_array_size", &int_array_size);
@@ -243,7 +285,7 @@ EMSCRIPTEN_BINDINGS(bullet) {
         function("DynamicsWorld_addAction", &DynamicsWorld_addAction, allow_raw_pointers());
         function("DynamicsWorld_removeAction", &DynamicsWorld_removeAction, allow_raw_pointers());
 
-        function("DebugDraw_new", &DebugDraw_new, allow_raw_pointers());
+        // function("DebugDraw_new", &DebugDraw_new, allow_raw_pointers());
         function("DebugDraw_setDebugMode", &DebugDraw_setDebugMode, allow_raw_pointers());
         function("DebugDraw_getDebugMode", &DebugDraw_getDebugMode, allow_raw_pointers());
         function("DebugDraw_setActiveObjectColor", &DebugDraw_setActiveObjectColor, allow_raw_pointers());
@@ -289,7 +331,7 @@ EMSCRIPTEN_BINDINGS(bullet) {
         function("ccMaterial_set", &ccMaterial_set, allow_raw_pointers());
 
         // CharacterController
-        function("ControllerHitReport_new", &ControllerHitReport_new, allow_raw_pointers());
+        // function("ControllerHitReport_new", &ControllerHitReport_new, allow_raw_pointers());
         function("CharacterController_getGhostObject", &CharacterController_getGhostObject, allow_raw_pointers());
         function("CharacterController_getCollisionShape", &CharacterController_getCollisionShape, allow_raw_pointers());
         // function("ControllerHit_getCurrentController", &ControllerHit_getCurrentController, allow_raw_pointers());

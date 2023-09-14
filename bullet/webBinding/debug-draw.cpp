@@ -3,13 +3,13 @@
 #include "btBulletDynamicsCommon.h"
 #include "macro.h"
 
-extern "C"
-{
-    void onDebugDrawLine(const int from, const int to, int color) DLL_IMPORT(onDebugDrawLine);
-    void onClearLines() DLL_IMPORT(onClearLines);
-    void onFlushLines() DLL_IMPORT(onFlushLines);
-    // void onControllerHitExt(const int hit, const int controller) DLL_IMPORT(onControllerHit);
-}
+// extern "C"
+// {
+//     void onDebugDrawLine(const int from, const int to, int color) DLL_IMPORT(onDebugDrawLine);
+//     void onClearLines() DLL_IMPORT(onClearLines);
+//     void onFlushLines() DLL_IMPORT(onFlushLines);
+//     // void onControllerHitExt(const int hit, const int controller) DLL_IMPORT(onControllerHit);
+// }
 
 #define BT_LINE_BATCH_SIZE 512
 ATTRIBUTE_ALIGNED16(class)
@@ -47,22 +47,18 @@ public:
     virtual int getDebugMode() const {
 		return m_debugMode;
 	}
-    virtual void clearLines(){
-        onClearLines();
-    }
-    virtual void flushLines(){
-        onFlushLines();
-    }
+    
+    virtual void onDebugDrawLine(const int from, const int to, int color) = 0;
     
 };
 
 // extern "C"
 // {
     // btDebugDraw
-    int DLL_EXPORT DebugDraw_new()
-    {
-        return (int)new btDebugDraw();
-    }
+    // int DLL_EXPORT DebugDraw_new()
+    // {
+    //     return (int)new btDebugDraw();
+    // }
 
     void DLL_EXPORT DebugDraw_setDebugMode(int ptr, int debugMode)
     {
