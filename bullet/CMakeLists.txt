@@ -17,6 +17,6 @@ OPTION(USE_MSVC_INCREMENTAL_LINKING "Use MSVC Incremental Linking" OFF)
 OPTION(USE_CUSTOM_VECTOR_MATH "Use custom vectormath library" OFF)
 OPTION(BUILD_CPU_DEMOS "Build original Bullet CPU demos"        OFF)
 
-SUBDIRS(src)
+add_subdirectory(src)
 INCLUDE(webBinding/BulletWebBindings.cmake)
 
