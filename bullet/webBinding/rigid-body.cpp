@@ -63,15 +63,18 @@
         btRigidBody *rb = (btRigidBody *)rb_ptr;
         btVector3 inertia{1.6666666269302368, 1.6666666269302368, 1.6666666269302368};
         btCollisionShape *cs = (btCollisionShape *)rb->getCollisionShape();
-        if (cs->isCompound())
+        if(strcmp( cs->getName(), "Empty") != 0)
         {
-            btCompoundShape *CollisionShape_com = (btCompoundShape *)cs;
-            if (CollisionShape_com->getNumChildShapes() > 0)
-                CollisionShape_com->calculateLocalInertia(mass, inertia);
-        }
-        else
-        {
-            cs->calculateLocalInertia(mass, inertia);
+            if (cs->isCompound())
+            {
+                btCompoundShape *CollisionShape_com = (btCompoundShape *)cs;
+                if (CollisionShape_com->getNumChildShapes() > 0)
+                    CollisionShape_com->calculateLocalInertia(mass, inertia);
+            }
+            else
+            {
+                cs->calculateLocalInertia(mass, inertia);
+            }
         }
         rb->setMassProps(mass, inertia);
     }
@@ -219,5 +222,12 @@
     {
         btRigidBody *colObj = (btRigidBody *)ptr;
         return (int)colObj->getMotionState();
+    }
+
+    void DLL_EXPORT RigidBody_getWorldTransform(int ptr, int ptr2){
+        btRigidBody *colObj = (btRigidBody *)ptr;
+        btMotionState *p = colObj->getMotionState();
+        btTransform *trans = (btTransform *)ptr2;
+        p->getWorldTransform(*trans);
     }
 // }

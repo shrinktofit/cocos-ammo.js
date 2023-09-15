@@ -146,6 +146,14 @@ typedef btAlignedObjectArray<const btCollisionObject *> ccCollisionObjectArray;
         return ptr2;
     }
 
+    int DLL_EXPORT Transform_getRotationAndOrigin(int ptr, int ptr2) {
+        btTransform *trans = (btTransform *)ptr;
+        btQuaternion *quat = (btQuaternion *)ptr2;
+        trans->getBasis().getRotation(*quat);
+        int ptr3 = (int)(&(trans->getOrigin()));
+        return ptr3;
+    }
+
     // ccVector3Array
 
     int DLL_EXPORT Vec3_array_at(int ptr, int n)

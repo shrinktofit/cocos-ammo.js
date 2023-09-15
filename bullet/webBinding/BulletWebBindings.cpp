@@ -94,6 +94,7 @@ EMSCRIPTEN_BINDINGS(bullet) {
         function("Transform_setRotation", &Transform_setRotation, allow_raw_pointers());
         function("Transform_getOrigin", &Transform_getOrigin, allow_raw_pointers());
         function("Transform_getRotation", &Transform_getRotation, allow_raw_pointers());
+        function("Transform_getRotationAndOrigin", &Transform_getRotationAndOrigin, allow_raw_pointers());
 
         //MotionState
         function("MotionState_getWorldTransform", &MotionState_getWorldTransform, allow_raw_pointers());
@@ -197,6 +198,7 @@ EMSCRIPTEN_BINDINGS(bullet) {
         function("CollisionObject_getCollisionShape", &CollisionObject_getCollisionShape, allow_raw_pointers());
         function("CollisionObject_setCollisionShape", &CollisionObject_setCollisionShape, allow_raw_pointers());
         function("CollisionObject_setContactProcessingThreshold", &CollisionObject_setContactProcessingThreshold, allow_raw_pointers());
+        function("CollisionObject_isSleeping", &CollisionObject_isSleeping, allow_raw_pointers());
         function("CollisionObject_getActivationState", &CollisionObject_getActivationState, allow_raw_pointers());
         // function("CollisionObject_setActivationState", &CollisionObject_setActivationState, allow_raw_pointers());
         function("CollisionObject_forceActivationState", &CollisionObject_forceActivationState, allow_raw_pointers());
@@ -241,7 +243,7 @@ EMSCRIPTEN_BINDINGS(bullet) {
         function("RigidBody_applyTorque", &RigidBody_applyTorque, allow_raw_pointers());
         function("RigidBody_applyForce", &RigidBody_applyForce, allow_raw_pointers());
         function("RigidBody_applyImpulse", &RigidBody_applyImpulse, allow_raw_pointers());
-        
+        function("RigidBody_getWorldTransform", &RigidBody_getWorldTransform, allow_raw_pointers());
         //dynamic
         function("DefaultCollisionConfiguration_static", &DefaultCollisionConfiguration_static, allow_raw_pointers());
         function("CollisionDispatcher_new", &CollisionDispatcher_new, allow_raw_pointers());

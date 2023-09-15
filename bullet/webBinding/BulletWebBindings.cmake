@@ -23,13 +23,14 @@ SET(CMAKE_CXX_FLAGS "-std=c++11 -fno-exceptions -ffunction-sections\
           -Wno-shadow -Wno-double-promotion -Wno-extra-semi-stmt -Wno-unused-but-set-variable\
           -Wno-invalid-utf8 -Wno-unused-template -Wno-sign-compare -Wno-misleading-indentation\
           -Wno-unreachable-code-return -Wno-switch-enum\
-          -Wno-unreachable-code-break -Wno-js-compiler")
+          -Wno-unreachable-code-break -Wno-js-compiler\
+          -fno-threadsafe-statics")
 
 # Build debug info for all configurations
-SET(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -O0 -g3")
-SET(CMAKE_CXX_FLAGS_CHECKED "-std=c++11 -g3 -gdwarf-2 -O3")
-SET(CMAKE_CXX_FLAGS_PROFILE "-std=c++11 -O3 -g")
-SET(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -O3")
+SET(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -std=c++11 -O0 -g3")
+SET(CMAKE_CXX_FLAGS_CHECKED "${CMAKE_CXX_FLAGS_CHECKED} -std=c++11 -g3 -gdwarf-2 -O3")
+SET(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_PROFILE} -std=c++11 -O3 -g")
+SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11 -O3 -g0")
 
 #https://emscripten.org/docs/optimizing/Optimizing-Code.html#optimizing-code-size
 #https://github.com/emscripten-core/emscripten/blob/main/src/settings.js

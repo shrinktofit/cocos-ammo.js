@@ -125,6 +125,12 @@
         c0->setUserIndex(index);
     }
 
+    int DLL_EXPORT CollisionObject_isSleeping(int ptr)
+    {
+        btCollisionObject *c0 = (btCollisionObject *)ptr;
+        return c0->getActivationState() == ISLAND_SLEEPING;
+    }
+
     int DLL_EXPORT CollisionObject_getActivationState(int ptr)
     {
         btCollisionObject *c0 = (btCollisionObject *)ptr;
