@@ -188,6 +188,8 @@ declare namespace Bullet {
         RigidBody_applyTorque(p: ptr, f: ptr): void;
         RigidBody_applyForce(p: ptr, f: ptr, rp: ptr): void;
         RigidBody_applyImpulse(p: ptr, f: ptr, rp: ptr): void;
+        RigidBody_getWorldTransform(p: ptr, transform: ptr): void;
+        Transform_getRotationAndOrigin(transform: ptr, q: ptr): ptr;
 
         // dynamic
 
