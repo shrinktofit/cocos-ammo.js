@@ -45,11 +45,11 @@ mode="release"
 fi
 
 echo -e "\033[01;32m --------------- Build $mode --------------- \033[0m"
-    cmake .. -G "Unix Makefiles" -B ./ -DBUILD_WASM=ON -DCMAKE_BUILD_TYPE=$mode -DCMAKE_TOOLCHAIN_FILE=${EMSCRIPTEN}/cmake/Modules/Platform/Emscripten.cmake
+    cmake . -G "Unix Makefiles" -B ./ -DBUILD_WASM=ON -DCMAKE_BUILD_TYPE=$mode -DCMAKE_TOOLCHAIN_FILE=${EMSCRIPTEN}/cmake/Modules/Platform/Emscripten.cmake
     make -j "$thread_num"
     echo -e "\033[01;32m ---------- Build wasm $mode DONE ----------  \033[0m"
     
-    cmake .. -G "Unix Makefiles" -B ./ -DBUILD_WASM=OFF -DCMAKE_BUILD_TYPE=$mode -DCMAKE_TOOLCHAIN_FILE=${EMSCRIPTEN}/cmake/Modules/Platform/Emscripten.cmake
+    cmake . -G "Unix Makefiles" -B ./ -DBUILD_WASM=OFF -DCMAKE_BUILD_TYPE=$mode -DCMAKE_TOOLCHAIN_FILE=${EMSCRIPTEN}/cmake/Modules/Platform/Emscripten.cmake
     make -j "$thread_num"
     echo -e "\033[01;32m ---------- Build asm $mode DONE ----------  \033[0m"
 
