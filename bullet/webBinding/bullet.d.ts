@@ -12,6 +12,20 @@ declare function Bullet (moduleOptions?: any): Promise<void>;
 declare namespace Bullet {
     type ptr = number;
     interface instance {
+        HEAP8: Int8Array;
+        HEAP16: Int16Array;
+        HEAP32: Int32Array;
+        HEAPU8: Uint8Array;
+        HEAPU16: Uint16Array;
+        HEAPU32: Uint32Array;
+        HEAPF32: Float32Array;
+        HEAPF64: Float64Array;
+
+        // class interface
+        DebugDraw: any;
+        ControllerHitReport: any;
+        MotionState: any;
+
         _malloc(bytes: number): ptr;
         _free(p: ptr): void;
         _read_f32(p: ptr): void;
